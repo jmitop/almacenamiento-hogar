@@ -1,2242 +1,1178 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Almacenamiento del Hogar</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #f5f3ee;
-      --surface: #fff;
-      --surface2: #faf9f6;
-      --border: #e0ddd5;
-      --border2: #c8c5bb;
-      --text: #2c2c2a;
-      --text2: #888780;
-      --text3: #b4b2a9;
-      --accent: #2c2c2a;
-      --accent-h: #444441;
-      --ok: #16a34a;
-      --warn: #d97706;
-      --full: #dc2626;
-      --radius: 10px;
-      --radius-lg: 14px;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh
-    }
-
-    /* SETUP SCREEN */
-    #setup-screen {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px
-    }
-
-    .setup-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 28px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, .08)
-    }
-
-    .setup-logo {
-      font-size: 32px;
-      margin-bottom: 8px
-    }
-
-    .setup-box h2 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 6px
-    }
-
-    .setup-box p {
-      font-size: 13px;
-      color: var(--text2);
-      line-height: 1.6;
-      margin-bottom: 18px
-    }
-
-    .setup-step {
-      background: var(--bg);
-      border-radius: 10px;
-      padding: 13px 15px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      line-height: 1.7
-    }
-
-    .setup-step strong {
-      color: var(--text);
-      font-weight: 600
-    }
-
-    .setup-step a {
-      color: #2563eb;
-      text-decoration: none
-    }
-
-    .setup-step a:hover {
-      text-decoration: underline
-    }
-
-    .setup-fields {
-      margin-top: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px
-    }
-
-    .setup-field label {
-      display: block;
-      font-size: 12px;
-      color: var(--text2);
-      margin-bottom: 3px
-    }
-
-    .setup-field input {
-      width: 100%;
-      font-size: 13px;
-      padding: 9px 11px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: inherit;
-      outline: none;
-      color: var(--text)
-    }
-
-    .setup-field input:focus {
-      border-color: var(--border2)
-    }
-
-    .setup-field .hint {
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 3px
-    }
-
-    .setup-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px
-    }
-
-    .setup-error {
-      font-size: 12px;
-      color: #dc2626;
-      margin-top: 8px;
-      display: none
-    }
-
-    /* SYNC STATUS BAR */
-    #sync-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 6px 22px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      color: var(--text2)
-    }
-
-    .sync-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0
-    }
-
-    .sync-dot.synced {
-      background: #16a34a
-    }
-
-    .sync-dot.syncing {
-      background: #d97706;
-      animation: pulse 1s infinite
-    }
-
-    .sync-dot.error {
-      background: #dc2626
-    }
-
-    .sync-dot.offline {
-      background: #b4b2a9
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: .4
-      }
-    }
-
-    #sync-bar .sync-actions {
-      margin-left: auto;
-      display: flex;
-      gap: 6px
-    }
-
-    .sync-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 3px 9px;
-      font-size: 11px;
-      cursor: pointer;
-      font-family: inherit;
-      color: var(--text2)
-    }
-
-    .sync-btn:hover {
-      background: var(--bg)
-    }
-
-    /* HEADER */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 13px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 50
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .logo h1 {
-      font-size: 16px;
-      font-weight: 600
-    }
-
-    .logo small {
-      font-size: 11px;
-      color: var(--text2);
-      display: block;
-      margin-top: 1px
-    }
-
-    .hbtns {
-      display: flex;
-      gap: 7px
-    }
-
-    .btn {
-      font-family: inherit;
-      font-size: 13px;
-      padding: 7px 13px;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      transition: background .13s
-    }
-
-    .btn:hover {
-      background: var(--bg)
-    }
-
-    .btn-dark {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent)
-    }
-
-    .btn-dark:hover {
-      background: var(--accent-h);
-      border-color: var(--accent-h)
-    }
-
-    .btn-sm {
-      font-size: 12px;
-      padding: 5px 10px
-    }
-
-    .btn-danger {
-      background: none;
-      border: 1px solid #fca5a5;
-      color: #dc2626;
-      border-radius: 8px;
-      padding: 6px 11px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: inherit
-    }
-
-    .btn-danger:hover {
-      background: #fee2e2
-    }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 2px;
-      background: var(--bg);
-      padding: 14px 22px 0
-    }
-
-    .tab {
-      font-size: 13px;
-      padding: 8px 15px;
-      border-radius: 8px 8px 0 0;
-      cursor: pointer;
-      border: 1px solid transparent;
-      border-bottom: none;
-      color: var(--text2);
-      background: transparent;
-      font-family: inherit
-    }
-
-    .tab.active {
-      background: var(--surface);
-      border-color: var(--border);
-      color: var(--text)
-    }
-
-    main {
-      max-width: 1020px;
-      margin: 0 auto;
-      padding: 18px 15px
-    }
-
-    .tab-panel {
-      display: none
-    }
-
-    .tab-panel.active {
-      display: block
-    }
-
-    /* STATS */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 9px;
-      margin-bottom: 18px
-    }
-
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 11px 13px
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      margin-bottom: 3px
-    }
-
-    .stat-val {
-      font-size: 22px;
-      font-weight: 600
-    }
-
-    .stat-sub {
-      font-size: 11px;
-      color: var(--text2);
-      margin-top: 2px
-    }
-
-    /* CONTROLS */
-    .controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-      flex-wrap: wrap
-    }
-
-    .controls input,
-    .controls select {
-      flex: 1;
-      min-width: 140px;
-      font-size: 13px;
-      padding: 8px 11px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      color: var(--text);
-      font-family: inherit;
-      outline: none
-    }
-
-    .controls input:focus,
-    .controls select:focus {
-      border-color: var(--border2)
-    }
-
-    /* LOCATIONS */
-    .locations {
-      display: flex;
-      flex-direction: column;
-      gap: 10px
-    }
-
-    .loc-group {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      overflow: hidden
-    }
-
-    .loc-header {
-      display: flex;
-      align-items: center;
-      padding: 10px 13px;
-      cursor: pointer;
-      user-select: none;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      gap: 9px
-    }
-
-    .loc-header:hover {
-      background: #f0ede6
-    }
-
-    .loc-icon-wrap {
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-      flex-shrink: 0
-    }
-
-    .loc-info {
-      flex: 1;
-      min-width: 0
-    }
-
-    .loc-name {
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.2
-    }
-
-    .loc-dims {
-      font-size: 10px;
-      color: var(--text3);
-      margin-top: 1px
-    }
-
-    .loc-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0
-    }
-
-    .loc-count {
-      font-size: 11px;
-      color: var(--text2);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2px 7px;
-      white-space: nowrap
-    }
-
-    .occ-wrap {
-      display: flex;
-      align-items: center;
-      gap: 7px
-    }
-
-    .occ-bar-outer {
-      width: 80px;
-      height: 8px;
-      background: var(--bg);
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid var(--border)
-    }
-
-    .occ-bar-inner {
-      height: 100%;
-      border-radius: 20px;
-      transition: width .4s cubic-bezier(.4, 0, .2, 1)
-    }
-
-    .occ-pct {
-      font-size: 11px;
-      font-weight: 600;
-      min-width: 32px;
-      text-align: right
-    }
-
-    .loc-edit-btn {
-      background: none;
-      border: none;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--text3);
-      padding: 3px 6px;
-      border-radius: 5px;
-      font-family: inherit
-    }
-
-    .loc-edit-btn:hover {
-      background: var(--border);
-      color: var(--text)
-    }
-
-    .chevron {
-      font-size: 10px;
-      color: var(--text3);
-      transition: transform .2s;
-      display: inline-block
-    }
-
-    .chevron.open {
-      transform: rotate(180deg)
-    }
-
-    .loc-body {
-      padding: 12px
-    }
-
-    .loc-occ-detail {
-      font-size: 11px;
-      color: var(--text2);
-      margin-bottom: 8px;
-      padding: 6px 10px;
-      background: var(--bg);
-      border-radius: 7px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap
-    }
-
-    .loc-occ-detail span b {
-      color: var(--text);
-      font-weight: 600
-    }
-
-    /* ITEMS */
-    .items-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(182px, 1fr));
-      gap: 8px
-    }
-
-    .item-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 11px;
-      position: relative;
-      transition: border-color .12s
-    }
-
-    .item-card:hover {
-      border-color: var(--border2)
-    }
-
-    .item-name {
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 4px;
-      padding-right: 26px;
-      line-height: 1.3
-    }
-
-    .item-meta-row {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      flex-wrap: wrap
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 20px;
-      font-weight: 500
-    }
-
-    .item-qty {
-      font-size: 11px;
-      color: var(--text2)
-    }
-
-    .item-note {
-      font-size: 11px;
-      color: var(--text2);
-      margin-top: 4px;
-      font-style: italic;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap
-    }
-
-    .item-vol {
-      font-size: 10px;
-      color: var(--text3);
-      margin-top: 3px
-    }
-
-    .item-actions {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      display: none;
-      gap: 3px
-    }
-
-    .item-card:hover .item-actions {
-      display: flex
-    }
-
-    .btn-icon {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      width: 22px;
-      height: 22px;
-      font-size: 11px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text2);
-      font-family: inherit
-    }
-
-    .btn-icon:hover {
-      background: var(--bg);
-      color: var(--text)
-    }
-
-    .empty-loc {
-      padding: 14px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text2)
-    }
-
-    .empty-loc a {
-      color: var(--text);
-      cursor: pointer;
-      text-decoration: underline
-    }
-
-    /* SPACES TAB */
-    .spaces-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
-      gap: 10px;
-      margin-bottom: 18px
-    }
-
-    .space-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 13px;
-      display: flex;
-      align-items: flex-start;
-      gap: 11px;
-      position: relative;
-      overflow: hidden
-    }
-
-    .space-card:hover .sc-actions {
-      display: flex
-    }
-
-    .sc-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0
-    }
-
-    .sc-info {
-      flex: 1;
-      min-width: 0
-    }
-
-    .sc-name {
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 2px
-    }
-
-    .sc-desc {
-      font-size: 11px;
-      color: var(--text2);
-      margin-bottom: 3px
-    }
-
-    .sc-dims-tag {
-      font-size: 10px;
-      color: var(--text3)
-    }
-
-    .sc-occ-row {
-      margin-top: 7px
-    }
-
-    .sc-occ-bar-outer {
-      height: 6px;
-      background: var(--bg);
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      margin-bottom: 3px
-    }
-
-    .sc-occ-bar-inner {
-      height: 100%;
-      border-radius: 20px;
-      transition: width .4s
-    }
-
-    .sc-occ-label {
-      font-size: 10px;
-      color: var(--text2)
-    }
-
-    .sc-actions {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      display: none;
-      gap: 3px
-    }
-
-    .add-space-card {
-      border: 2px dashed var(--border);
-      background: transparent;
-      cursor: pointer;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      gap: 6px;
-      min-height: 80px;
-      display: flex;
-      align-items: center;
-      border-radius: var(--radius-lg)
-    }
-
-    .add-space-card:hover {
-      border-color: var(--border2);
-      background: var(--surface2)
-    }
-
-    /* CHARTS */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 14px;
-      margin-bottom: 22px
-    }
-
-    .chart-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 17px
-    }
-
-    .chart-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 13px;
-      color: var(--text)
-    }
-
-    .chart-empty {
-      font-size: 13px;
-      color: var(--text2);
-      text-align: center;
-      padding: 22px 0
-    }
-
-    .bar-row {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin-bottom: 8px
-    }
-
-    .bar-label {
-      font-size: 12px;
-      color: var(--text2);
-      width: 140px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex-shrink: 0
-    }
-
-    .bar-track {
-      flex: 1;
-      background: var(--bg);
-      border-radius: 20px;
-      height: 14px;
-      overflow: hidden;
-      position: relative
-    }
-
-    .bar-fill {
-      height: 100%;
-      border-radius: 20px;
-      transition: width .5s cubic-bezier(.4, 0, .2, 1)
-    }
-
-    .bar-num {
-      font-size: 12px;
-      color: var(--text2);
-      min-width: 34px;
-      text-align: right;
-      font-weight: 500
-    }
-
-    .donut-wrap {
-      display: flex;
-      align-items: center;
-      gap: 18px
-    }
-
-    .donut-legend {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1
-    }
-
-    .legend-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 12px;
-      color: var(--text2)
-    }
-
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      flex-shrink: 0
-    }
-
-    .occ-summary-row {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin-bottom: 9px
-    }
-
-    .occ-summary-label {
-      font-size: 12px;
-      color: var(--text2);
-      width: 140px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex-shrink: 0
-    }
-
-    .occ-summary-track {
-      flex: 1;
-      background: var(--bg);
-      border-radius: 20px;
-      height: 18px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      position: relative
-    }
-
-    .occ-fill-used {
-      height: 100%;
-      border-radius: 20px;
-      position: absolute;
-      left: 0;
-      top: 0;
-      transition: width .5s
-    }
-
-    .occ-summary-pct {
-      font-size: 12px;
-      font-weight: 600;
-      min-width: 38px;
-      text-align: right
-    }
-
-    /* MODALS */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, .4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      padding: 16px
-    }
-
-    .overlay.show {
-      display: flex
-    }
-
-    .modal {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 14px 44px rgba(0, 0, 0, .16);
-      max-height: 92vh;
-      overflow-y: auto
-    }
-
-    .modal h3 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 15px
-    }
-
-    .form-row {
-      margin-bottom: 10px
-    }
-
-    .form-row label {
-      display: block;
-      font-size: 12px;
-      color: var(--text2);
-      margin-bottom: 3px
-    }
-
-    .form-row input,
-    .form-row select,
-    .form-row textarea {
-      width: 100%;
-      font-size: 13px;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: inherit;
-      outline: none;
-      color: var(--text);
-      background: var(--surface)
-    }
-
-    .form-row input:focus,
-    .form-row select:focus,
-    .form-row textarea:focus {
-      border-color: var(--border2)
-    }
-
-    .form-row textarea {
-      resize: vertical;
-      min-height: 55px
-    }
-
-    .dims-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 7px
-    }
-
-    .dims-row input {
-      text-align: center
-    }
-
-    .dims-label {
-      font-size: 11px;
-      color: var(--text3);
-      text-align: center;
-      margin-top: 2px
-    }
-
-    .dims-preview {
-      font-size: 11px;
-      color: var(--text2);
-      background: var(--bg);
-      border-radius: 6px;
-      padding: 5px 9px;
-      margin-top: 5px
-    }
-
-    .section-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 12px 0
-    }
-
-    .section-label {
-      font-size: 11px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 8px;
-      margin-top: 2px
-    }
-
-    .icon-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 3px
-    }
-
-    .icon-option {
-      width: 33px;
-      height: 33px;
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      transition: border-color .12s
-    }
-
-    .icon-option:hover,
-    .icon-option.sel {
-      border-color: var(--text);
-      background: var(--bg)
-    }
-
-    .color-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 3px
-    }
-
-    .color-swatch {
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color .12s
-    }
-
-    .color-swatch.sel {
-      border-color: var(--text)
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      margin-top: 15px;
-      align-items: center
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 13px
-    }
-
-    .section-header h2 {
-      font-size: 15px;
-      font-weight: 600
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--text2);
-      margin-top: 6px
-    }
-
-    /* CONFLICT MODAL */
-    .conflict-box {
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 11px 13px;
-      margin-bottom: 10px;
-      font-size: 12px;
-      line-height: 1.6
-    }
-
-    .conflict-box strong {
-      color: var(--text)
-    }
-
-    .conflict-options {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px
-    }
-
-    .conflict-options button {
-      flex: 1;
-      font-size: 12px;
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: inherit;
-      border: 1px solid var(--border);
-      background: var(--surface)
-    }
-
-    .conflict-options button:hover {
-      background: var(--bg)
-    }
-
-    .conflict-options .btn-pick {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent)
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Almacenamiento del Hogar</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f3ee;--surface:#fff;--surface2:#faf9f6;--border:#e0ddd5;--border2:#c8c5bb;
+  --text:#2c2c2a;--text2:#888780;--text3:#b4b2a9;--accent:#2c2c2a;--accent-h:#444441;
+  --ok:#16a34a;--warn:#d97706;--err:#dc2626;--radius:10px;--radius-lg:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+ 
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo h1{font-size:16px;font-weight:600}
+.logo small{font-size:11px;color:var(--text2);display:block;margin-top:1px}
+.hbtns{display:flex;gap:7px}
+ 
+/* SYNC BAR */
+#sync-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 22px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text2)}
+.sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:var(--ok)}
+.sync-dot.busy{background:var(--warn);animation:blink 1s infinite}
+.sync-dot.err{background:var(--err)}
+.sync-dot.off{background:var(--text3)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#sync-bar .ml{margin-left:auto;display:flex;gap:6px}
+.sync-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text2)}
+.sync-btn:hover{background:var(--bg);color:var(--text)}
+ 
+/* BUTTONS */
+.btn{font-family:inherit;font-size:13px;padding:7px 13px;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:background .13s}
+.btn:hover{background:var(--bg)}
+.btn-dark{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-dark:hover{background:var(--accent-h)}
+.btn-sm{font-size:12px;padding:5px 10px}
+.btn-danger{background:none;border:1px solid #fca5a5;color:var(--err);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-danger:hover{background:#fee2e2}
+.btn-ok{background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:8px;padding:7px 13px;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-ok:hover{background:#bbf7d0}
+ 
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg);padding:14px 22px 0;overflow-x:auto}
+.tab{font-size:13px;padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;border:1px solid transparent;border-bottom:none;color:var(--text2);background:transparent;font-family:inherit;white-space:nowrap}
+.tab.active{background:var(--surface);border-color:var(--border);color:var(--text)}
+ 
+main{max-width:1020px;margin:0 auto;padding:18px 15px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+ 
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:600}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:2px}
+ 
+/* CONTROLS */
+.controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.controls input,.controls select{flex:1;min-width:140px;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:inherit;outline:none}
+.controls input:focus,.controls select:focus{border-color:var(--border2)}
+ 
+/* LOCATIONS */
+.locations{display:flex;flex-direction:column;gap:10px}
+.loc-group{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden}
+.loc-header{display:flex;align-items:center;padding:10px 13px;cursor:pointer;user-select:none;background:var(--surface2);border-bottom:1px solid var(--border);gap:9px}
+.loc-header:hover{background:#f0ede6}
+.loc-icon-wrap{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.loc-info{flex:1;min-width:0}
+.loc-name{font-size:14px;font-weight:500;line-height:1.2}
+.loc-dims{font-size:10px;color:var(--text3);margin-top:1px}
+.loc-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.loc-count{font-size:11px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2px 7px;white-space:nowrap}
+.occ-wrap{display:flex;align-items:center;gap:6px}
+.occ-bar-outer{width:76px;height:8px;background:var(--bg);border-radius:20px;overflow:hidden;border:1px solid var(--border)}
+.occ-bar-inner{height:100%;border-radius:20px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.occ-pct{font-size:11px;font-weight:600;min-width:30px;text-align:right}
+.loc-edit-btn{background:none;border:none;font-size:13px;cursor:pointer;color:var(--text3);padding:3px 6px;border-radius:5px;font-family:inherit}
+.loc-edit-btn:hover{background:var(--border);color:var(--text)}
+.chevron{font-size:10px;color:var(--text3);transition:transform .2s;display:inline-block}
+.chevron.open{transform:rotate(180deg)}
+.loc-body{padding:12px}
+.loc-occ-detail{font-size:11px;color:var(--text2);margin-bottom:8px;padding:6px 10px;background:var(--bg);border-radius:7px;display:flex;gap:12px;flex-wrap:wrap}
+.loc-occ-detail span b{color:var(--text);font-weight:600}
+ 
+/* ITEMS */
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(182px,1fr));gap:8px}
+.item-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 11px;position:relative;transition:border-color .12s}
+.item-card:hover{border-color:var(--border2)}
+.item-name{font-size:13px;font-weight:500;margin-bottom:4px;padding-right:26px;line-height:1.3}
+.item-meta-row{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.badge{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:500}
+.item-qty{font-size:11px;color:var(--text2)}
+.item-note{font-size:11px;color:var(--text2);margin-top:4px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-vol{font-size:10px;color:var(--text3);margin-top:3px}
+.item-actions{position:absolute;top:7px;right:7px;display:none;gap:3px}
+.item-card:hover .item-actions{display:flex}
+.btn-icon{background:var(--surface);border:1px solid var(--border);border-radius:5px;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:inherit}
+.btn-icon:hover{background:var(--bg);color:var(--text)}
+.empty-loc{padding:14px;text-align:center;font-size:13px;color:var(--text2)}
+.empty-loc a{color:var(--text);cursor:pointer;text-decoration:underline}
+ 
+/* SPACES TAB */
+.spaces-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:10px;margin-bottom:16px}
+.space-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;display:flex;align-items:flex-start;gap:11px;position:relative}
+.space-card:hover .sc-actions{display:flex}
+.sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sc-info{flex:1;min-width:0}
+.sc-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.sc-desc{font-size:11px;color:var(--text2);margin-bottom:3px}
+.sc-dims-tag{font-size:10px;color:var(--text3)}
+.sc-occ-row{margin-top:7px}
+.sc-occ-bar-outer{height:6px;background:var(--bg);border-radius:20px;overflow:hidden;border:1px solid var(--border);margin-bottom:3px}
+.sc-occ-bar-inner{height:100%;border-radius:20px;transition:width .4s}
+.sc-occ-label{font-size:10px}
+.sc-actions{position:absolute;top:8px;right:8px;display:none;gap:3px}
+.add-space-card{border:2px dashed var(--border);background:transparent;cursor:pointer;justify-content:center;flex-direction:column;text-align:center;gap:5px;min-height:80px;display:flex;align-items:center;border-radius:var(--radius-lg)}
+.add-space-card:hover{border-color:var(--border2);background:var(--surface2)}
+ 
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-bottom:22px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:17px}
+.chart-title{font-size:13px;font-weight:600;margin-bottom:13px}
+.chart-empty{font-size:13px;color:var(--text2);text-align:center;padding:22px 0}
+.bar-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.bar-label{font-size:12px;color:var(--text2);width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-track{flex:1;background:var(--bg);border-radius:20px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.bar-num{font-size:12px;color:var(--text2);min-width:34px;text-align:right;font-weight:500}
+.donut-wrap{display:flex;align-items:center;gap:18px}
+.donut-legend{display:flex;flex-direction:column;gap:6px;flex:1}
+.legend-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.occ-sum-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.occ-sum-label{font-size:12px;color:var(--text2);width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.occ-sum-track{flex:1;background:var(--bg);border-radius:20px;height:18px;overflow:hidden;border:1px solid var(--border);position:relative}
+.occ-fill{height:100%;border-radius:20px;position:absolute;left:0;top:0;transition:width .5s}
+.occ-sum-pct{font-size:12px;font-weight:600;min-width:36px;text-align:right}
+ 
+/* CONFIG TAB */
+.cfg-page{max-width:620px}
+.cfg-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px}
+.cfg-section-title{font-size:14px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.cfg-section-sub{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6}
+.cfg-field{margin-bottom:12px}
+.cfg-field label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500}
+.cfg-field input{width:100%;font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-family:inherit;outline:none;color:var(--text);background:var(--surface)}
+.cfg-field input:focus{border-color:var(--border2)}
+.cfg-field .field-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5}
+.cfg-field .field-hint a{color:#2563eb;text-decoration:none}
+.cfg-field .field-hint a:hover{text-decoration:underline}
+.cfg-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.cfg-status{font-size:12px;margin-top:10px;padding:8px 12px;border-radius:8px;display:none}
+.cfg-status.ok{background:#dcfce7;color:#166534;display:block}
+.cfg-status.err{background:#fee2e2;color:var(--err);display:block}
+.cfg-status.info{background:#dbeafe;color:#1e40af;display:block}
+.bin-id-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;font-family:monospace;word-break:break-all;margin-top:6px;color:var(--text)}
+.bin-id-box small{font-family:inherit;font-size:11px;color:var(--text2);display:block;margin-bottom:4px}
+.copy-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;margin-top:6px}
+.copy-btn:hover{background:var(--bg)}
+.cfg-mode-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:20px;margin-bottom:12px}
+.cfg-mode-badge.local{background:#fef9c3;color:#713f12}
+.cfg-mode-badge.synced{background:#dcfce7;color:#166534}
+.danger-zone{border-top:1px solid #fecaca;margin-top:14px;padding-top:14px}
+.danger-zone-title{font-size:12px;font-weight:600;color:var(--err);margin-bottom:8px}
+.hint{font-size:12px;color:var(--text2);margin-top:6px}
+ 
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;box-shadow:0 14px 44px rgba(0,0,0,.16);max-height:92vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:15px}
+.form-row{margin-bottom:10px}
+.form-row label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px}
+.form-row input,.form-row select,.form-row textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;outline:none;color:var(--text);background:var(--surface)}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--border2)}
+.form-row textarea{resize:vertical;min-height:55px}
+.dims-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.dims-row input{text-align:center}
+.dims-label{font-size:11px;color:var(--text3);text-align:center;margin-top:2px}
+.dims-preview{font-size:11px;color:var(--text2);background:var(--bg);border-radius:6px;padding:5px 9px;margin-top:5px}
+.section-divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+.section-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.icon-picker{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
+.icon-option{width:33px;height:33px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:border-color .12s}
+.icon-option:hover,.icon-option.sel{border-color:var(--text);background:var(--bg)}
+.color-picker{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
+.color-swatch{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent}
+.color-swatch.sel{border-color:var(--text)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px;align-items:center}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.section-header h2{font-size:15px;font-weight:600}
+ 
+/* TOAST */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:13px;padding:9px 18px;border-radius:10px;z-index:9999;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.18);pointer-events:none;opacity:0}
+</style>
 </head>
-
 <body>
-
-  <!-- ===== SETUP SCREEN ===== -->
-  <div id="setup-screen">
-    <div class="setup-box">
-      <div class="setup-logo">🏠</div>
-      <h2>Configura la sincronización</h2>
-      <p>Para que todos los miembros de la familia vean los mismos datos en tiempo real, necesitas una cuenta gratuita
-        en <strong>JSONBin.io</strong>. Solo hay que hacerlo <strong>una vez</strong>. El resto de la familia solo
-        necesita la clave que tú les des.</p>
-
-      <div class="setup-step">
-        <strong>Paso 1</strong> — Ve a <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → Crear cuenta
-        (gratis)<br>
-        <strong>Paso 2</strong> — En el panel ve a <strong>API Keys</strong> → copia tu <strong>Master Key</strong>
-        (empieza por <code>$2b$10$…</code>) o una <strong>Access Key</strong><br>
-        <strong>Paso 3</strong> — Selecciona el tipo de clave abajo, pégala y haz clic en "Conectar"
-      </div>
-
-      <div class="setup-fields">
-        <div class="setup-field">
-          <label>Tipo de clave</label>
-          <select id="cfg-keytype" onchange="onSetupKeyTypeChange()" style="width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;outline:none;color:var(--text);background:var(--surface)">
-            <option value="master">🔑 Master Key (cuenta propia, crea bins)</option>
-            <option value="access">🔒 Access Key (más segura para compartir, requiere Bin ID)</option>
-          </select>
-        </div>
-        <div class="setup-field">
-          <label id="cfg-apikey-label">Master Key de JSONBin</label>
-          <input type="password" id="cfg-apikey" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-          <div class="hint">Se guarda solo en tu navegador, nunca se envía a ningún servidor nuestro.</div>
-        </div>
-        <div class="setup-field" id="cfg-bin-field" style="display:none">
-          <label id="cfg-binid-label">Bin ID</label>
-          <input type="text" id="cfg-binid" placeholder="6xxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-          <div class="hint" id="cfg-binid-hint">Si es la primera vez, déjalo vacío — lo crearemos automáticamente. Si ya tienes uno, pégalo aquí para compartir los mismos datos.</div>
-        </div>
-      </div>
-
-      <p id="setup-error" class="setup-error">Error al conectar. Revisa que la clave sea correcta.</p>
-
-      <div class="setup-actions">
-        <button class="btn btn-dark" onclick="setupConnect()" id="setup-btn">Conectar y empezar →</button>
-        <button class="btn" onclick="setupSkip()">Usar sin sincronización</button>
-      </div>
-
-      <p style="font-size:11px;color:var(--text3);margin-top:14px;line-height:1.6">
-        También puedes usar localmente sin sincronización y conectar más tarde desde Configuración.
-        Los datos gratis en JSONBin están limitados a <strong>10.000 peticiones/mes</strong> y <strong>10 MB</strong>,
-        más que suficiente para uso doméstico.
-      </p>
+ 
+<div id="toast"></div>
+ 
+<!-- SYNC BAR -->
+<div id="sync-bar" style="display:none">
+  <div class="sync-dot off" id="sync-dot"></div>
+  <span id="sync-label">—</span>
+  <div class="ml">
+    <button class="sync-btn" onclick="syncPull(true)">↓ Sync</button>
+  </div>
+</div>
+ 
+<header>
+  <div class="logo">
+    <span style="font-size:20px">🏠</span>
+    <div>
+      <h1>Almacenamiento del Hogar</h1>
+      <small id="last-update">—</small>
     </div>
   </div>
-
-  <!-- ===== SYNC BAR ===== -->
-  <div id="sync-bar" style="display:none">
-    <div class="sync-dot offline" id="sync-dot"></div>
-    <span id="sync-label">—</span>
-    <div class="sync-actions">
-      <button class="sync-btn" onclick="syncPull(true)" title="Recargar datos del servidor">↓ Sincronizar</button>
-      <button class="sync-btn" onclick="openSettings()">⚙ Config</button>
-    </div>
+  <div class="hbtns">
+    <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-dark" onclick="openItemModal()">+ Añadir objeto</button>
   </div>
-
-  <header style="display:none" id="main-header">
-    <div class="logo">
-      <span style="font-size:20px">🏠</span>
-      <div>
-        <h1>Almacenamiento del Hogar</h1>
-        <small id="last-update">Cargando…</small>
-      </div>
-    </div>
-    <div class="hbtns">
-      <button class="btn" onclick="exportCSV()">⬇ CSV</button>
-      <button class="btn btn-dark" onclick="openItemModal()">+ Añadir objeto</button>
-    </div>
-  </header>
-
-  <div class="tabs" id="main-tabs" style="display:none">
-    <button class="tab active" onclick="switchTab('inventario',this)">📋 Inventario</button>
-    <button class="tab" onclick="switchTab('espacios',this)">🗂 Espacios</button>
-    <button class="tab" onclick="switchTab('graficos',this)">📊 Gráficos</button>
-    <button class="tab" onclick="switchTab('setup',this)">⚙ Configuración</button>
+</header>
+ 
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('inventario',this)">📋 Inventario</button>
+  <button class="tab" onclick="switchTab('espacios',this)">🗂 Espacios</button>
+  <button class="tab" onclick="switchTab('graficos',this)">📊 Gráficos</button>
+  <button class="tab" onclick="switchTab('config',this)">⚙️ Configuración</button>
+</div>
+ 
+<main>
+ 
+<!-- INVENTARIO -->
+<div class="tab-panel active" id="panel-inventario">
+  <div class="stats" id="stats"></div>
+  <div class="controls">
+    <input type="text" id="search" placeholder="🔍  Buscar objeto o nota…" oninput="render()"/>
+    <select id="filter-loc" onchange="render()"><option value="">Todos los espacios</option></select>
+    <select id="filter-cat" onchange="render()"><option value="">Todas las categorías</option></select>
   </div>
-
-  <main id="main-content" style="display:none">
-
-    <!-- INVENTARIO -->
-    <div class="tab-panel active" id="panel-inventario">
-      <div class="stats" id="stats"></div>
-      <div class="controls">
-        <input type="text" id="search" placeholder="🔍  Buscar objeto o nota…" oninput="render()" />
-        <select id="filter-loc" onchange="render()">
-          <option value="">Todos los espacios</option>
-        </select>
-        <select id="filter-cat" onchange="render()">
-          <option value="">Todas las categorías</option>
-        </select>
-      </div>
-      <div class="locations" id="locations"></div>
-    </div>
-
-    <!-- ESPACIOS -->
-    <div class="tab-panel" id="panel-espacios">
-      <div class="section-header">
-        <h2>Mis espacios de almacenamiento</h2>
-        <button class="btn btn-dark btn-sm" onclick="openSpaceModal()">+ Nuevo espacio</button>
-      </div>
-      <div class="spaces-grid" id="spaces-grid"></div>
-      <p class="hint">Pasa el cursor para editar · Las dimensiones permiten calcular % de ocupación por volumen.</p>
-    </div>
-
-    <!-- GRÁFICOS -->
-    <div class="tab-panel" id="panel-graficos">
-      <div class="charts-grid" id="charts-grid"></div>
-    </div>
-
-    <!-- CONFIGURACIÓN -->
-    <div class="tab-panel" id="panel-setup">
-      <div style="max-width:520px;margin:0 auto">
-        <div class="section-header" style="margin-bottom:18px">
-          <h2>⚙ Configuración de sincronización</h2>
-        </div>
-
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px">
-          <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px">
-            Los datos se sincronizan mediante <strong>JSONBin.io</strong> (servicio gratuito).
-            Guarda tu Master Key y Bin ID para poder acceder desde otros dispositivos o compartir con tu familia.
-          </p>
-
-          <div class="setup-step" style="margin-bottom:14px">
-            <strong>Master Key</strong> → acceso completo, puede crear bins nuevos. Úsala en tu dispositivo principal.<br>
-            <strong>Access Key</strong> → más segura para compartir, solo lee/escribe un bin concreto. Requiere Bin ID existente.<br>
-            Ambas se encuentran en <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → <strong>API Keys</strong>
-          </div>
-
-          <div class="form-row">
-            <label>Tipo de clave</label>
-            <select id="tab-keytype" onchange="onTabKeyTypeChange()" style="width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;outline:none;color:var(--text);background:var(--surface)">
-              <option value="master">🔑 Master Key (cuenta propia, crea bins)</option>
-              <option value="access">🔒 Access Key (más segura para compartir)</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label id="tab-apikey-label">Master Key de JSONBin</label>
-            <input type="password" id="tab-apikey" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-            <div class="hint">Se guarda solo en tu navegador (localStorage). Nunca se envía a ningún servidor nuestro.</div>
-          </div>
-          <div class="form-row" style="margin-top:10px">
-            <label id="tab-binid-label">Bin ID <span id="tab-binid-optional" style="color:var(--text3);font-weight:400">(déjalo vacío para crear uno nuevo)</span></label>
-            <input type="text" id="tab-binid" placeholder="6xxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-            <div class="hint" id="tab-binid-hint">Comparte este ID con tu familia para que todos usen los mismos datos.</div>
-          </div>
-
-          <div id="tab-cfg-status" style="font-size:12px;margin-top:10px;min-height:18px"></div>
-
-          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center">
-            <button class="btn btn-dark" onclick="saveTabSettings()">Guardar y conectar</button>
-            <button class="btn" onclick="disconnectTabSettings()"
-              style="color:#dc2626;border-color:#fca5a5">Desconectar</button>
-            <div style="flex:1"></div>
-            <div id="tab-mode-badge"
-              style="font-size:11px;padding:4px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--text2)">
-            </div>
-          </div>
-        </div>
-
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:10px">📤 Exportar datos</div>
-          <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">
-            Descarga todos tus objetos como archivo CSV compatible con Excel.
-          </p>
-          <button class="btn" onclick="exportCSV()">⬇ Descargar CSV</button>
-        </div>
+  <div class="locations" id="locations"></div>
+</div>
+ 
+<!-- ESPACIOS -->
+<div class="tab-panel" id="panel-espacios">
+  <div class="section-header">
+    <h2>Mis espacios</h2>
+    <button class="btn btn-dark btn-sm" onclick="openSpaceModal()">+ Nuevo espacio</button>
+  </div>
+  <div class="spaces-grid" id="spaces-grid"></div>
+  <p class="hint">Pasa el cursor sobre una tarjeta para editarla · Las dimensiones permiten calcular % de ocupación por volumen.</p>
+</div>
+ 
+<!-- GRÁFICOS -->
+<div class="tab-panel" id="panel-graficos">
+  <div class="charts-grid" id="charts-grid"></div>
+</div>
+ 
+<!-- CONFIGURACIÓN -->
+<div class="tab-panel" id="panel-config">
+<div class="cfg-page">
+ 
+  <!-- Estado actual -->
+  <div class="cfg-section">
+    <div class="cfg-section-title">🔌 Estado de sincronización</div>
+    <div class="cfg-section-sub">Conecta con JSONBin.io para que todos los dispositivos compartan los mismos datos en tiempo real. Es gratuito y no requiere servidor propio.</div>
+ 
+    <div id="cfg-mode-indicator"></div>
+ 
+    <div class="cfg-field">
+      <label>🔑 Master Key <span style="color:var(--text3);font-weight:400">(lectura + escritura)</span></label>
+      <input type="password" id="cfg-master" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" oninput="onCfgInput()"/>
+      <div class="field-hint">
+        Obtén tu Master Key en <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → inicia sesión → menú superior <strong>API Keys</strong> → copia la <strong>Master Key</strong>.
       </div>
     </div>
-
-  </main>
-
-  <!-- ===== MODAL OBJETO ===== -->
-  <div class="overlay" id="overlay-item">
-    <div class="modal">
-      <h3 id="item-modal-title">Añadir objeto</h3>
-      <div class="form-row"><label>Nombre *</label><input id="f-name" placeholder="Ej: Ropa de invierno" /></div>
-      <div class="form-row"><label>Espacio *</label><select id="f-loc"></select></div>
-      <div class="form-row"><label>Categoría</label><select id="f-cat"></select></div>
-      <div class="form-row"><label>Cantidad</label><input id="f-qty" type="number" min="1" value="1"
-          oninput="updateItemVolPreview()" /></div>
-      <hr class="section-divider" />
-      <p class="section-label">Dimensiones del bulto (opcional, en cm)</p>
-      <div class="dims-row">
-        <div><input id="f-w" type="number" min="0" step="0.1" placeholder="—" oninput="updateItemVolPreview()" />
-          <div class="dims-label">Ancho</div>
-        </div>
-        <div><input id="f-l" type="number" min="0" step="0.1" placeholder="—" oninput="updateItemVolPreview()" />
-          <div class="dims-label">Largo</div>
-        </div>
-        <div><input id="f-h" type="number" min="0" step="0.1" placeholder="—" oninput="updateItemVolPreview()" />
-          <div class="dims-label">Alto</div>
-        </div>
+ 
+    <div class="cfg-field">
+      <label>🔓 Access Key <span style="color:var(--text3);font-weight:400">(solo lectura, recomendado compartir esta)</span></label>
+      <input type="password" id="cfg-access" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+      <div class="field-hint">
+        En JSONBin → <strong>API Keys</strong> → <strong>Access Keys</strong> → crea una nueva. Comparte esta clave con tu familia en lugar de la Master Key.
       </div>
-      <div id="item-vol-preview" class="dims-preview" style="display:none"></div>
-      <hr class="section-divider" />
-      <div class="form-row"><label>Nota</label><textarea id="f-note"
-          placeholder="Color de caja, material, ubicación exacta…"></textarea></div>
-      <div class="modal-actions">
-        <div id="item-danger" style="display:none;flex:1;text-align:left"><button class="btn-danger"
-            onclick="deleteCurrentItem()">Eliminar</button></div>
-        <button class="btn" onclick="closeItemModal()">Cancelar</button>
-        <button class="btn btn-dark" onclick="saveItemModal()">Guardar</button>
+    </div>
+ 
+    <div class="cfg-field">
+      <label>📦 Bin ID <span style="color:var(--text3);font-weight:400">(identificador del almacén de datos)</span></label>
+      <input type="text" id="cfg-binid" placeholder="67xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+      <div class="field-hint">
+        Si es tu primera vez déjalo vacío → se creará automáticamente. Si otra persona ya creó el bin, pega aquí su ID para compartir los mismos datos.
+      </div>
+    </div>
+ 
+    <div class="cfg-actions">
+      <button class="btn btn-dark" id="btn-connect" onclick="cfgConnect()">🔗 Conectar y sincronizar</button>
+      <button class="btn" onclick="cfgTestOnly()">🧪 Solo probar conexión</button>
+    </div>
+ 
+    <div class="cfg-status" id="cfg-status-msg"></div>
+ 
+    <!-- Bin ID activo -->
+    <div id="cfg-bin-display" style="display:none;margin-top:14px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500">Bin ID activo (comparte esto con tu familia):</div>
+      <div class="bin-id-box"><small>Bin ID</small><span id="cfg-bin-val">—</span></div>
+      <button class="copy-btn" onclick="copyBinId()">📋 Copiar Bin ID</button>
+    </div>
+ 
+    <div class="danger-zone" id="cfg-danger" style="display:none">
+      <div class="danger-zone-title">⚠️ Zona de riesgo</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-danger" onclick="cfgDisconnect()">Desconectar JSONBin</button>
+        <button class="btn-danger" onclick="cfgClearLocal()">Borrar datos locales</button>
       </div>
     </div>
   </div>
-
-  <!-- ===== MODAL ESPACIO ===== -->
-  <div class="overlay" id="overlay-space">
-    <div class="modal">
-      <h3 id="space-modal-title">Nuevo espacio</h3>
-      <div class="form-row"><label>Nombre *</label><input id="s-name" placeholder="Ej: Trastero · Estantería 4" /></div>
-      <div class="form-row"><label>Descripción</label><input id="s-desc"
-          placeholder="Ej: Estantería metálica al fondo" /></div>
-      <div class="form-row"><label>Icono</label>
-        <div class="icon-picker" id="icon-picker"></div>
-      </div>
-      <div class="form-row"><label>Color</label>
-        <div class="color-picker" id="color-picker"></div>
-      </div>
-      <hr class="section-divider" />
-      <p class="section-label">Dimensiones del espacio (opcional, en cm)</p>
-      <div class="dims-row">
-        <div><input id="s-w" type="number" min="0" step="1" placeholder="—" oninput="updateSpaceVolPreview()" />
-          <div class="dims-label">Ancho</div>
-        </div>
-        <div><input id="s-l" type="number" min="0" step="1" placeholder="—" oninput="updateSpaceVolPreview()" />
-          <div class="dims-label">Largo</div>
-        </div>
-        <div><input id="s-h" type="number" min="0" step="1" placeholder="—" oninput="updateSpaceVolPreview()" />
-          <div class="dims-label">Alto</div>
-        </div>
-      </div>
-      <div id="space-vol-preview" class="dims-preview" style="display:none"></div>
-      <div class="modal-actions">
-        <div id="space-danger" style="display:none;flex:1;text-align:left"><button class="btn-danger"
-            onclick="deleteCurrentSpace()">Eliminar espacio</button></div>
-        <button class="btn" onclick="closeSpaceModal()">Cancelar</button>
-        <button class="btn btn-dark" onclick="saveSpaceModal()">Guardar</button>
-      </div>
+ 
+  <!-- Datos y backup -->
+  <div class="cfg-section">
+    <div class="cfg-section-title">💾 Datos y copia de seguridad</div>
+    <div class="cfg-section-sub">Exporta tus datos en cualquier momento. El CSV se puede abrir con Excel o Google Sheets.</div>
+    <div class="cfg-actions">
+      <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
+      <button class="btn" onclick="exportJSON()">⬇ Exportar JSON</button>
+      <button class="btn" onclick="importJSON()">⬆ Importar JSON</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)"/>
+    <div style="margin-top:12px;font-size:12px;color:var(--text2)">
+      Objetos guardados: <strong id="cfg-item-count">—</strong> &nbsp;·&nbsp; Espacios: <strong id="cfg-space-count">—</strong> &nbsp;·&nbsp; Última modificación: <strong id="cfg-last-mod">—</strong>
     </div>
   </div>
-
-  <!-- ===== MODAL CONFIGURACIÓN ===== -->
-  <div class="overlay" id="overlay-settings">
-    <div class="modal">
-      <h3>⚙ Configuración de sincronización</h3>
-      <div class="form-row">
-        <label>Master Key de JSONBin</label>
-        <input type="password" id="cfg2-apikey" placeholder="$2b$10$…" />
-      </div>
-      <div class="form-row">
-        <label>Bin ID</label>
-        <input type="text" id="cfg2-binid" placeholder="6xxxxxxxxxxxxxxxxxxxxxxx" />
-        <div class="hint" style="font-size:11px;color:var(--text3);margin-top:3px">Comparte este ID con tu familia para
-          que usen los mismos datos.</div>
-      </div>
-      <div id="cfg-status" style="font-size:12px;margin-top:8px;min-height:18px"></div>
-      <div class="modal-actions">
-        <button class="btn-danger" onclick="resetConfig()">Desconectar</button>
-        <div style="flex:1"></div>
-        <button class="btn" onclick="closeSettings()">Cancelar</button>
-        <button class="btn btn-dark" onclick="saveSettings()">Guardar</button>
-      </div>
+ 
+  <!-- Instrucciones rápidas -->
+  <div class="cfg-section">
+    <div class="cfg-section-title">📖 Cómo empezar con JSONBin (3 pasos)</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.8">
+      <strong style="color:var(--text)">1.</strong> Ve a <a href="https://jsonbin.io" target="_blank" style="color:#2563eb">jsonbin.io</a> → Crea una cuenta gratuita<br>
+      <strong style="color:var(--text)">2.</strong> En el menú superior haz clic en <strong style="color:var(--text)">API Keys</strong> → copia la <strong style="color:var(--text)">Master Key</strong><br>
+      <strong style="color:var(--text)">3.</strong> Pégala arriba en "Master Key" → haz clic en <strong style="color:var(--text)">Conectar y sincronizar</strong><br><br>
+      El Bin ID se creará solo. Comparte ese ID (y la Access Key si la generas) con tu familia para que usen los mismos datos.<br><br>
+      <strong style="color:var(--text)">Plan gratuito:</strong> 10.000 peticiones/mes · 10 MB por bin · Suficiente para uso doméstico.
     </div>
   </div>
-
-  <!-- ===== MODAL CONFLICTO ===== -->
-  <div class="overlay" id="overlay-conflict">
-    <div class="modal">
-      <h3>⚡ Conflicto de datos</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-        Los datos del servidor son más recientes que los tuyos locales. ¿Con qué versión te quedas?
-      </p>
-      <div class="conflict-box">
-        <strong>📡 Servidor:</strong> <span id="conf-server-info"></span>
-      </div>
-      <div class="conflict-box">
-        <strong>💻 Tu dispositivo:</strong> <span id="conf-local-info"></span>
-      </div>
-      <div class="conflict-options">
-        <button onclick="resolveConflict('server')">Usar servidor →</button>
-        <button onclick="resolveConflict('local')" class="btn-pick">Mantener local →</button>
-        <button onclick="resolveConflict('merge')">Fusionar ✦</button>
-      </div>
-      <p style="font-size:11px;color:var(--text3);margin-top:10px">Fusionar mantiene todos los objetos de ambas
-        versiones evitando duplicados por nombre.</p>
-    </div>
+ 
+</div>
+</div><!-- /panel-config -->
+ 
+</main>
+ 
+<!-- ===== MODAL OBJETO ===== -->
+<div class="overlay" id="overlay-item">
+<div class="modal">
+  <h3 id="item-modal-title">Añadir objeto</h3>
+  <div class="form-row"><label>Nombre *</label><input id="f-name" placeholder="Ej: Ropa de invierno"/></div>
+  <div class="form-row"><label>Espacio *</label><select id="f-loc"></select></div>
+  <div class="form-row"><label>Categoría</label><select id="f-cat"></select></div>
+  <div class="form-row"><label>Cantidad</label><input id="f-qty" type="number" min="1" value="1" oninput="updateItemVolPrev()"/></div>
+  <hr class="section-divider"/>
+  <p class="section-label">Dimensiones del bulto (opcional · cm)</p>
+  <div class="dims-row">
+    <div><input id="f-w" type="number" min="0" step="0.1" placeholder="—" oninput="updateItemVolPrev()"/><div class="dims-label">Ancho</div></div>
+    <div><input id="f-l" type="number" min="0" step="0.1" placeholder="—" oninput="updateItemVolPrev()"/><div class="dims-label">Largo</div></div>
+    <div><input id="f-h" type="number" min="0" step="0.1" placeholder="—" oninput="updateItemVolPrev()"/><div class="dims-label">Alto</div></div>
   </div>
-
-  <script>
-    // ============================================================
-    //  CONFIG
-    // ============================================================
-    const STORAGE_KEY = "hogar_v4_data";
-    const STORAGE_CFG = "hogar_v4_cfg";
-    const JSONBIN_BASE = "https://api.jsonbin.io/v3";
-    const AUTO_SYNC_MS = 60000; // auto-pull cada 60s
-
-    const ICONS = ["🛏️", "🚪", "📦", "🗄️", "🧺", "🪜", "🏠", "🛋️", "🧹", "🔧", "📚", "🎒", "🪣", "🖼️", "🎸", "⚽", "🧸", "🍳", "❄️", "💼"];
-    const COLORS = ["#f1f5f9", "#fef3c7", "#dcfce7", "#dbeafe", "#ede9fe", "#fce7f3", "#ffedd5", "#ccfbf1", "#fef9c3", "#fee2e2"];
-    const CATS = [
-      { id: "ropa", label: "Ropa", bg: "#dbeafe", tc: "#1e40af" },
-      { id: "herramientas", label: "Herramientas", bg: "#fef3c7", tc: "#92400e" },
-      { id: "electronica", label: "Electrónica", bg: "#ede9fe", tc: "#4c1d95" },
-      { id: "documentos", label: "Documentos", bg: "#dcfce7", tc: "#166534" },
-      { id: "decoracion", label: "Decoración", bg: "#fce7f3", tc: "#831843" },
-      { id: "deportes", label: "Deportes", bg: "#ccfbf1", tc: "#134e4a" },
-      { id: "cocina", label: "Cocina", bg: "#ffedd5", tc: "#7c2d12" },
-      { id: "juguetes", label: "Juguetes", bg: "#fef9c3", tc: "#713f12" },
-      { id: "limpieza", label: "Limpieza", bg: "#e0f2fe", tc: "#0c4a6e" },
-      { id: "otro", label: "Otro", bg: "#f1efe8", tc: "#444441" },
-    ];
-
-    // ============================================================
-    //  STATE
-    // ============================================================
-    let data = { spaces: [], items: [], updatedAt: 0 };
-    let cfg = { apiKey: "", binId: "", mode: "local", keyType: "master" }; // mode: local | synced  keyType: master | access
-    let collapsed = {};
-    let editingItemId = null;
-    let editingSpaceId = null;
-    let selIcon = "📦";
-    let selColor = "#f1f5f9";
-    let syncTimer = null;
-    let pendingConflict = null; // {server, local}
-
-    // ============================================================
-    //  UTILS
-    // ============================================================
-    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const esc = s => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    const num = v => parseFloat(v) || 0;
-    const vol = (w, l, h) => (num(w) > 0 && num(l) > 0 && num(h) > 0) ? num(w) * num(l) * num(h) : 0;
-    const fmtV = v => v >= 1e6 ? (v / 1e6).toFixed(2) + " m³" : v >= 1000 ? (v / 1000).toFixed(1) + " dm³" : v.toFixed(0) + " cm³";
-    const catOf = id => CATS.find(c => c.id === id) || CATS[CATS.length - 1];
-    const occColor = pct => pct >= 95 ? "var(--full)" : pct >= 70 ? "var(--warn)" : "var(--ok)";
-
-    function spaceVol(sp) { return vol(sp.w, sp.l, sp.h); }
-    function itemsIn(locId) { return data.items.filter(i => i.loc === locId); }
-    function usedVol(locId) {
-      return itemsIn(locId).reduce((s, i) => s + vol(i.w, i.l, i.h) * (parseInt(i.qty) || 1), 0);
-    }
-    function occData(sp) {
-      const sv = spaceVol(sp), uv = usedVol(sp.id);
-      const items = itemsIn(sp.id);
-      const withoutDims = items.filter(i => !vol(i.w, i.l, i.h)).length;
-      return sv > 0
-        ? { hasDims: true, sv, uv, pct: Math.min(100, uv / sv * 100), withoutDims }
-        : { hasDims: false, sv: 0, uv, pct: 0, withoutDims };
-    }
-
-    // ============================================================
-    //  LOCAL STORAGE
-    // ============================================================
-    function loadLocal() {
-      try { const r = localStorage.getItem(STORAGE_KEY); if (r) data = JSON.parse(r); } catch (e) { }
-      if (!data.spaces || !data.spaces.length) data = defaultData();
-    }
-    function saveLocal() {
-      data.updatedAt = Date.now();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      document.getElementById("last-update").textContent =
-        "Guardado: " + new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-    }
-    function loadCfg() {
-      try { const r = localStorage.getItem(STORAGE_CFG); if (r) cfg = JSON.parse(r); } catch (e) { }
-    }
-    function saveCfg() {
-      localStorage.setItem(STORAGE_CFG, JSON.stringify(cfg));
-    }
-
-    // ============================================================
-    //  JSONBIN API
-    // ============================================================
-    async function apiFetch(method, path, body) {
-      // Usar el header correcto según el tipo de clave
-      const keyHeader = (cfg.keyType === "access") ? "X-Access-Key" : "X-Master-Key";
-      const res = await fetch(JSONBIN_BASE + path, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          [keyHeader]: cfg.apiKey,
-          "X-Bin-Versioning": "false"
-        },
-        body: body ? JSON.stringify(body) : undefined
-      });
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error("JSONBin " + res.status + ": " + txt);
-      }
-      return res.json();
-    }
-
-    async function createBin() {
-      const res = await apiFetch("POST", "/b", { record: data, name: "AlmacenamientoHogar" });
-      return res.metadata.id;
-    }
-
-    async function readBin() {
-      const res = await apiFetch("GET", "/b/" + cfg.binId + "/latest");
-      return res.record;
-    }
-
-    async function writeBin() {
-      await apiFetch("PUT", "/b/" + cfg.binId, data);
-    }
-
-    // ============================================================
-    //  SYNC STATUS UI
-    // ============================================================
-    function setSyncStatus(state, text) {
-      const dot = document.getElementById("sync-dot");
-      const lbl = document.getElementById("sync-label");
-      dot.className = "sync-dot " + state;
-      lbl.textContent = text;
-    }
-
-    // ============================================================
-    //  SYNC LOGIC
-    // ============================================================
-    async function syncPull(manual = false) {
-      if (cfg.mode !== "synced") return;
-      setSyncStatus("syncing", "Sincronizando…");
-      try {
-        const remote = await readBin();
-        const localTs = data.updatedAt || 0;
-        const remoteTs = remote.updatedAt || 0;
-
-        if (remoteTs > localTs && localTs > 0) {
-          // conflict: remote es más nuevo
-          pendingConflict = { server: remote, local: JSON.parse(JSON.stringify(data)) };
-          showConflict();
-          return;
-        }
-        if (remoteTs > localTs) {
-          data = remote;
-          saveLocal();
-          render();
-          if (document.getElementById("panel-espacios").classList.contains("active")) renderSpaces();
-        }
-        setSyncStatus("synced", "Sincronizado · " + new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }));
-        if (manual) showToast("✅ Datos actualizados");
-      } catch (e) {
-        setSyncStatus("error", "Error de sincronización");
-        if (manual) showToast("❌ No se pudo sincronizar: " + e.message, true);
-      }
-    }
-
-    async function syncPush() {
-      if (cfg.mode !== "synced") return;
-      setSyncStatus("syncing", "Guardando…");
-      try {
-        await writeBin();
-        setSyncStatus("synced", "Guardado · " + new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }));
-      } catch (e) {
-        setSyncStatus("error", "Error al guardar remotamente");
-        showToast("❌ " + e.message, true);
-      }
-    }
-
-    async function saveAndSync() {
+  <div id="item-vol-prev" class="dims-preview" style="display:none"></div>
+  <hr class="section-divider"/>
+  <div class="form-row"><label>Nota</label><textarea id="f-note" placeholder="Color de caja, material, ubicación exacta…"></textarea></div>
+  <div class="modal-actions">
+    <div id="item-danger" style="display:none;flex:1;text-align:left"><button class="btn-danger" onclick="deleteCurrentItem()">Eliminar</button></div>
+    <button class="btn" onclick="closeItemModal()">Cancelar</button>
+    <button class="btn btn-dark" onclick="saveItemModal()">Guardar</button>
+  </div>
+</div>
+</div>
+ 
+<!-- ===== MODAL ESPACIO ===== -->
+<div class="overlay" id="overlay-space">
+<div class="modal">
+  <h3 id="space-modal-title">Nuevo espacio</h3>
+  <div class="form-row"><label>Nombre *</label><input id="s-name" placeholder="Ej: Trastero · Estantería 4"/></div>
+  <div class="form-row"><label>Descripción</label><input id="s-desc" placeholder="Ej: Estantería metálica al fondo"/></div>
+  <div class="form-row"><label>Icono</label><div class="icon-picker" id="icon-picker"></div></div>
+  <div class="form-row"><label>Color</label><div class="color-picker" id="color-picker"></div></div>
+  <hr class="section-divider"/>
+  <p class="section-label">Dimensiones (opcional · cm)</p>
+  <div class="dims-row">
+    <div><input id="s-w" type="number" min="0" step="1" placeholder="—" oninput="updateSpaceVolPrev()"/><div class="dims-label">Ancho</div></div>
+    <div><input id="s-l" type="number" min="0" step="1" placeholder="—" oninput="updateSpaceVolPrev()"/><div class="dims-label">Largo</div></div>
+    <div><input id="s-h" type="number" min="0" step="1" placeholder="—" oninput="updateSpaceVolPrev()"/><div class="dims-label">Alto</div></div>
+  </div>
+  <div id="space-vol-prev" class="dims-preview" style="display:none"></div>
+  <div class="modal-actions">
+    <div id="space-danger" style="display:none;flex:1;text-align:left"><button class="btn-danger" onclick="deleteCurrentSpace()">Eliminar espacio</button></div>
+    <button class="btn" onclick="closeSpaceModal()">Cancelar</button>
+    <button class="btn btn-dark" onclick="saveSpaceModal()">Guardar</button>
+  </div>
+</div>
+</div>
+ 
+<script>
+// ─────────────────────────────────────────────
+//  CONSTANTS
+// ─────────────────────────────────────────────
+const SK_DATA = "hogar_v5_data";
+const SK_CFG  = "hogar_v5_cfg";
+const JBIN    = "https://api.jsonbin.io/v3";
+const AUTO_MS = 60000;
+ 
+const ICONS = ["🛏️","🚪","📦","🗄️","🧺","🪜","🏠","🛋️","🧹","🔧","📚","🎒","🪣","🖼️","🎸","⚽","🧸","🍳","❄️","💼"];
+const CLRS  = ["#f1f5f9","#fef3c7","#dcfce7","#dbeafe","#ede9fe","#fce7f3","#ffedd5","#ccfbf1","#fef9c3","#fee2e2"];
+const CATS  = [
+  {id:"ropa",        label:"Ropa",         bg:"#dbeafe",tc:"#1e40af"},
+  {id:"herramientas",label:"Herramientas", bg:"#fef3c7",tc:"#92400e"},
+  {id:"electronica", label:"Electrónica",  bg:"#ede9fe",tc:"#4c1d95"},
+  {id:"documentos",  label:"Documentos",   bg:"#dcfce7",tc:"#166534"},
+  {id:"decoracion",  label:"Decoración",   bg:"#fce7f3",tc:"#831843"},
+  {id:"deportes",    label:"Deportes",     bg:"#ccfbf1",tc:"#134e4a"},
+  {id:"cocina",      label:"Cocina",       bg:"#ffedd5",tc:"#7c2d12"},
+  {id:"juguetes",    label:"Juguetes",     bg:"#fef9c3",tc:"#713f12"},
+  {id:"limpieza",    label:"Limpieza",     bg:"#e0f2fe",tc:"#0c4a6e"},
+  {id:"otro",        label:"Otro",         bg:"#f1efe8",tc:"#444441"},
+];
+ 
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let data = {spaces:[], items:[], updatedAt:0};
+let cfg  = {masterKey:"", accessKey:"", binId:"", mode:"local"};
+let collapsed = {};
+let editingItemId  = null;
+let editingSpaceId = null;
+let selIcon  = "📦";
+let selColor = "#f1f5f9";
+let autoTimer = null;
+ 
+// ─────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────
+const uid   = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const esc   = s  => (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const n     = v  => parseFloat(v) || 0;
+const vol3  = (w,l,h) => n(w)>0 && n(l)>0 && n(h)>0 ? n(w)*n(l)*n(h) : 0;
+const fmtV  = v  => v >= 1e6 ? (v/1e6).toFixed(2)+" m³" : v >= 1000 ? (v/1000).toFixed(1)+" dm³" : v.toFixed(0)+" cm³";
+const catOf = id => CATS.find(c=>c.id===id) || CATS[CATS.length-1];
+const occCl = pct => pct>=95?"var(--err)": pct>=70?"var(--warn)":"var(--ok)";
+const spVol = sp => vol3(sp.w, sp.l, sp.h);
+const usedVol = locId => data.items.filter(i=>i.loc===locId)
+  .reduce((s,i)=>s + vol3(i.w,i.l,i.h)*(parseInt(i.qty)||1), 0);
+const occData = sp => {
+  const sv=spVol(sp), uv=usedVol(sp.id);
+  const items=data.items.filter(i=>i.loc===sp.id);
+  const noDims=items.filter(i=>!vol3(i.w,i.l,i.h)).length;
+  return sv>0 ? {has:true,sv,uv,pct:Math.min(100,uv/sv*100),noDims}
+              : {has:false,sv:0,uv,pct:0,noDims};
+};
+ 
+// ─────────────────────────────────────────────
+//  LOCAL STORAGE
+// ─────────────────────────────────────────────
+function loadLocal() {
+  try { const r=localStorage.getItem(SK_DATA); if(r) data=JSON.parse(r); } catch(e){}
+  if (!data.spaces || !data.spaces.length) data = defaultData();
+}
+function saveLocal() {
+  data.updatedAt = Date.now();
+  localStorage.setItem(SK_DATA, JSON.stringify(data));
+  document.getElementById("last-update").textContent =
+    "Guardado: " + new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+  refreshCfgCounts();
+}
+function loadCfg() {
+  try { const r=localStorage.getItem(SK_CFG); if(r) cfg=JSON.parse(r); } catch(e){}
+}
+function saveCfg() { localStorage.setItem(SK_CFG, JSON.stringify(cfg)); }
+ 
+// ─────────────────────────────────────────────
+//  JSONBIN API
+// ─────────────────────────────────────────────
+async function jbFetch(method, path, body, readOnly=false) {
+  const key = readOnly && cfg.accessKey ? cfg.accessKey : cfg.masterKey;
+  const headers = {"Content-Type":"application/json"};
+  if (key.startsWith("$2b$") || key.startsWith("$2a$")) {
+    headers["X-Master-Key"] = cfg.masterKey;
+    if (cfg.accessKey) headers["X-Access-Key"] = cfg.accessKey;
+  } else {
+    // fallback
+    headers["X-Master-Key"] = cfg.masterKey;
+  }
+  headers["X-Bin-Versioning"] = "false";
+  const res = await fetch(JBIN+path, {
+    method, headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(()=>"");
+    throw new Error("JSONBin "+res.status+(t?": "+t:""));
+  }
+  return res.json();
+}
+ 
+async function jbCreate() {
+  const r = await jbFetch("POST", "/b", {record: data, name:"AlmacenamientoHogar"});
+  return r.metadata.id;
+}
+async function jbRead() {
+  const r = await jbFetch("GET", "/b/"+cfg.binId+"/latest", null, true);
+  return r.record;
+}
+async function jbWrite() {
+  await jbFetch("PUT", "/b/"+cfg.binId, data);
+}
+ 
+// ─────────────────────────────────────────────
+//  SYNC STATUS
+// ─────────────────────────────────────────────
+function setSyncDot(state, label) {
+  const d=document.getElementById("sync-dot");
+  const l=document.getElementById("sync-label");
+  d.className="sync-dot "+state;
+  l.textContent=label;
+}
+ 
+async function syncPull(manual=false) {
+  if (cfg.mode !== "synced") return;
+  setSyncDot("busy","Sincronizando…");
+  try {
+    const remote = await jbRead();
+    if (remote && remote.updatedAt > (data.updatedAt||0)) {
+      data = remote;
       saveLocal();
       render();
-      await syncPush();
+      if (document.getElementById("panel-espacios").classList.contains("active")) renderSpaces();
     }
-
-    function startAutoSync() {
-      if (syncTimer) clearInterval(syncTimer);
-      if (cfg.mode === "synced") syncTimer = setInterval(() => syncPull(false), AUTO_SYNC_MS);
-    }
-
-    // ============================================================
-    //  CONFLICT RESOLUTION
-    // ============================================================
-    function showConflict() {
-      const s = pendingConflict.server;
-      const l = pendingConflict.local;
-      document.getElementById("conf-server-info").textContent =
-        `${s.items?.length || 0} objetos · actualizado ${new Date(s.updatedAt || 0).toLocaleString("es-ES")}`;
-      document.getElementById("conf-local-info").textContent =
-        `${l.items?.length || 0} objetos · actualizado ${new Date(l.updatedAt || 0).toLocaleString("es-ES")}`;
-      document.getElementById("overlay-conflict").classList.add("show");
-    }
-
-    async function resolveConflict(choice) {
-      document.getElementById("overlay-conflict").classList.remove("show");
-      if (!pendingConflict) return;
-      const { server, local } = pendingConflict;
-      pendingConflict = null;
-
-      if (choice === "server") {
-        data = server; saveLocal(); render();
-        setSyncStatus("synced", "Sincronizado (servidor)");
-      } else if (choice === "local") {
-        data = local;
-        await syncPush();
-        setSyncStatus("synced", "Guardado (local)");
-      } else {
-        // merge: unir items sin duplicar por id
-        const mergedItems = [...server.items];
-        local.items.forEach(li => {
-          if (!mergedItems.find(si => si.id === li.id)) mergedItems.push(li);
-        });
-        // spaces: servidor gana para espacios
-        data = { ...server, items: mergedItems };
-        await saveAndSync();
-        setSyncStatus("synced", "Fusionado");
-        showToast("✅ Datos fusionados: " + mergedItems.length + " objetos");
-      }
-      render();
-    }
-
-    // ============================================================
-    //  TOAST
-    // ============================================================
-    function showToast(msg, isError = false) {
-      let t = document.getElementById("toast");
-      if (!t) {
-        t = document.createElement("div"); t.id = "toast"; document.body.appendChild(t);
-        t.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2c2c2a;color:#fff;font-size:13px;padding:9px 18px;border-radius:10px;z-index:9999;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)";
-      }
-      t.textContent = msg;
-      t.style.background = isError ? "#dc2626" : "#2c2c2a";
-      t.style.opacity = "1";
-      clearTimeout(t._timer);
-      t._timer = setTimeout(() => t.style.opacity = "0", 3000);
-    }
-
-    // ============================================================
-    //  SETUP
-    // ============================================================
-    document.getElementById("cfg-apikey").addEventListener("input", function () {
-      document.getElementById("cfg-bin-field").style.display = this.value.length > 10 ? "block" : "none";
+    setSyncDot("ok","Sync · "+new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}));
+    if (manual) toast("✅ Datos actualizados desde el servidor");
+  } catch(e) {
+    setSyncDot("err","Error de sync");
+    if (manual) toast("❌ "+e.message, true);
+  }
+}
+ 
+async function syncPush() {
+  if (cfg.mode !== "synced") return;
+  setSyncDot("busy","Guardando…");
+  try {
+    await jbWrite();
+    setSyncDot("ok","Guardado · "+new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}));
+  } catch(e) {
+    setSyncDot("err","Error al guardar");
+    toast("❌ "+e.message, true);
+  }
+}
+ 
+async function saveAndSync() {
+  saveLocal();
+  render();
+  await syncPush();
+}
+ 
+function startAutoSync() {
+  if (autoTimer) clearInterval(autoTimer);
+  if (cfg.mode === "synced") autoTimer = setInterval(()=>syncPull(false), AUTO_MS);
+}
+ 
+// ─────────────────────────────────────────────
+//  CONFIG TAB LOGIC
+// ─────────────────────────────────────────────
+function renderConfigTab() {
+  // populate fields from cfg
+  document.getElementById("cfg-master").value  = cfg.masterKey  || "";
+  document.getElementById("cfg-access").value  = cfg.accessKey  || "";
+  document.getElementById("cfg-binid").value   = cfg.binId      || "";
+ 
+  // mode badge
+  const ind = document.getElementById("cfg-mode-indicator");
+  if (cfg.mode === "synced") {
+    ind.innerHTML = `<div class="cfg-mode-badge synced">🟢 Sincronizado con JSONBin · Bin: <strong>${cfg.binId}</strong></div>`;
+    document.getElementById("cfg-bin-display").style.display = "block";
+    document.getElementById("cfg-bin-val").textContent = cfg.binId;
+    document.getElementById("cfg-danger").style.display = "block";
+    document.getElementById("sync-bar").style.display = "flex";
+  } else {
+    ind.innerHTML = `<div class="cfg-mode-badge local">🟡 Modo local · Los datos solo están en este dispositivo</div>`;
+    document.getElementById("cfg-bin-display").style.display = "none";
+    document.getElementById("cfg-danger").style.display = "none";
+  }
+ 
+  refreshCfgCounts();
+}
+ 
+function refreshCfgCounts() {
+  const ic = document.getElementById("cfg-item-count");
+  const sc = document.getElementById("cfg-space-count");
+  const lm = document.getElementById("cfg-last-mod");
+  if (ic) ic.textContent = data.items.length;
+  if (sc) sc.textContent = data.spaces.length;
+  if (lm) lm.textContent = data.updatedAt
+    ? new Date(data.updatedAt).toLocaleString("es-ES")
+    : "—";
+}
+ 
+function onCfgInput() {
+  // auto-show/hide access & bin fields based on master key presence
+}
+ 
+function cfgSetStatus(msg, type) {
+  const el = document.getElementById("cfg-status-msg");
+  el.className = "cfg-status " + type;
+  el.textContent = msg;
+}
+ 
+async function cfgTestOnly() {
+  const mk = document.getElementById("cfg-master").value.trim();
+  const bid = document.getElementById("cfg-binid").value.trim();
+  if (!mk) { cfgSetStatus("⚠️ Introduce la Master Key primero.", "err"); return; }
+  if (!bid) { cfgSetStatus("⚠️ Introduce un Bin ID para probar (o conecta para crear uno nuevo).", "err"); return; }
+  cfgSetStatus("Probando conexión…", "info");
+  const tmpCfg = {...cfg, masterKey:mk, binId:bid};
+  try {
+    const res = await fetch(JBIN+"/b/"+bid+"/latest", {
+      headers:{"X-Master-Key":mk,"X-Bin-Versioning":"false"}
     });
-
-    async function setupConnect() {
-      const key = document.getElementById("cfg-apikey").value.trim();
-      const binId = document.getElementById("cfg-binid").value.trim();
-      if (!key) { alert("Pega tu Master Key primero"); return; }
-      const btn = document.getElementById("setup-btn");
-      btn.textContent = "Conectando…"; btn.disabled = true;
-      document.getElementById("setup-error").style.display = "none";
-      cfg.apiKey = key;
-      try {
-        if (binId) {
-          cfg.binId = binId;
-          const remote = await readBin();
-          // Si hay datos locales y remotos, preferir remotos
-          if (remote && remote.items && remote.items.length > 0) {
-            data = remote;
-            saveLocal();
-          }
-        } else {
-          // Crear nuevo bin con los datos actuales
-          cfg.binId = await createBin();
-          showToast("✅ Bin creado: " + cfg.binId);
-        }
-        cfg.mode = "synced";
-        saveCfg();
-        launchApp();
-        startAutoSync();
-        await syncPull(false);
-      } catch (e) {
-        document.getElementById("setup-error").textContent = "Error: " + e.message;
-        document.getElementById("setup-error").style.display = "block";
-        btn.textContent = "Conectar y empezar →"; btn.disabled = false;
-      }
-    }
-
-    function setupSkip() {
-      cfg.mode = "local";
-      saveCfg();
-      launchApp();
-    }
-
-    function launchApp() {
-      document.getElementById("setup-screen").style.display = "none";
-      document.getElementById("sync-bar").style.display = cfg.mode === "synced" ? "flex" : "none";
-      document.getElementById("main-header").style.display = "flex";
-      document.getElementById("main-tabs").style.display = "flex";
-      document.getElementById("main-content").style.display = "block";
-      if (cfg.mode === "synced") {
-        setSyncStatus("synced", "Conectado a JSONBin · Bin: " + cfg.binId);
-      }
-      render();
-    }
-
-    // ============================================================
-    //  SETTINGS MODAL
-    // ============================================================
-    function openSettings() {
-      document.getElementById("cfg2-apikey").value = cfg.apiKey || "";
-      document.getElementById("cfg2-binid").value = cfg.binId || "";
-      document.getElementById("cfg-status").textContent = "";
-      document.getElementById("overlay-settings").classList.add("show");
-    }
-    function closeSettings() { document.getElementById("overlay-settings").classList.remove("show"); }
-
-    async function saveSettings() {
-      const key = document.getElementById("cfg2-apikey").value.trim();
-      const binId = document.getElementById("cfg2-binid").value.trim();
-      const st = document.getElementById("cfg-status");
-      st.textContent = "Probando conexión…"; st.style.color = "var(--text2)";
-      cfg.apiKey = key; cfg.binId = binId;
-      try {
-        const remote = await readBin();
-        cfg.mode = "synced"; saveCfg();
-        if (remote && remote.items) { data = remote; saveLocal(); render(); }
-        st.textContent = "✅ Conectado correctamente."; st.style.color = "var(--ok)";
-        document.getElementById("sync-bar").style.display = "flex";
-        setSyncStatus("synced", "Conectado · Bin: " + cfg.binId);
-        startAutoSync();
-        setTimeout(closeSettings, 1200);
-      } catch (e) {
-        st.textContent = "❌ Error: " + e.message; st.style.color = "var(--full)";
-      }
-    }
-
-    function resetConfig() {
-      if (!confirm("¿Desconectar de JSONBin? Los datos locales no se borran.")) return;
-      cfg = { apiKey: "", binId: "", mode: "local" }; saveCfg();
-      clearInterval(syncTimer);
-      document.getElementById("sync-bar").style.display = "none";
-      closeSettings();
-      showToast("Modo local activado");
-    }
-
-    // ============================================================
-    //  TABS
-    // ============================================================
-    function switchTab(name, el) {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-      el.classList.add("active");
-      document.getElementById("panel-" + name).classList.add("active");
-      if (name === "graficos") renderCharts();
-      if (name === "espacios") renderSpaces();
-      if (name === "setup") loadTabSettings();
-    }
-
-    function loadTabSettings() {
-      document.getElementById("tab-apikey").value = cfg.apiKey || "";
-      document.getElementById("tab-binid").value = cfg.binId || "";
-      document.getElementById("tab-cfg-status").textContent = "";
-      const badge = document.getElementById("tab-mode-badge");
-      if (cfg.mode === "synced") {
-        badge.textContent = "🟢 Conectado a JSONBin";
-        badge.style.color = "var(--ok)";
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    const r = await res.json();
+    const items = r.record?.items?.length ?? "?";
+    cfgSetStatus(`✅ Conexión OK · El bin tiene ${items} objetos.`, "ok");
+  } catch(e) {
+    cfgSetStatus("❌ Error: "+e.message, "err");
+  }
+}
+ 
+async function cfgConnect() {
+  const mk  = document.getElementById("cfg-master").value.trim();
+  const ak  = document.getElementById("cfg-access").value.trim();
+  const bid = document.getElementById("cfg-binid").value.trim();
+ 
+  if (!mk) { cfgSetStatus("⚠️ La Master Key es obligatoria.", "err"); return; }
+ 
+  cfgSetStatus("Conectando…", "info");
+  document.getElementById("btn-connect").disabled = true;
+ 
+  cfg.masterKey = mk;
+  cfg.accessKey = ak;
+ 
+  try {
+    if (bid) {
+      // use existing bin
+      cfg.binId = bid;
+      const res = await fetch(JBIN+"/b/"+bid+"/latest", {
+        headers:{"X-Master-Key":mk,"X-Bin-Versioning":"false"}
+      });
+      if (!res.ok) throw new Error("HTTP "+res.status+" al leer el bin");
+      const r = await res.json();
+      if (r.record && r.record.items && r.record.items.length > 0) {
+        // server has data — use it
+        data = r.record;
+        saveLocal();
       } else {
-        badge.textContent = "⚪ Modo local (sin sincronización)";
-        badge.style.color = "var(--text2)";
+        // bin exists but empty — push our data
+        await fetch(JBIN+"/b/"+bid, {
+          method:"PUT",
+          headers:{"Content-Type":"application/json","X-Master-Key":mk,"X-Bin-Versioning":"false"},
+          body: JSON.stringify(data)
+        });
       }
+      cfgSetStatus("✅ Conectado al bin existente · "+r.record?.items?.length+" objetos cargados.", "ok");
+    } else {
+      // create new bin
+      const res = await fetch(JBIN+"/b", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","X-Master-Key":mk,"X-Bin-Versioning":"false"},
+        body: JSON.stringify({record:data, name:"AlmacenamientoHogar"})
+      });
+      if (!res.ok) throw new Error("HTTP "+res.status+" al crear el bin");
+      const r = await res.json();
+      cfg.binId = r.metadata.id;
+      cfgSetStatus("✅ Bin creado correctamente · ID: "+cfg.binId, "ok");
     }
-
-    async function saveTabSettings() {
-      const key = document.getElementById("tab-apikey").value.trim();
-      const binId = document.getElementById("tab-binid").value.trim();
-      const st = document.getElementById("tab-cfg-status");
-      if (!key) { st.textContent = "⚠ Pega tu Master Key primero."; st.style.color = "var(--warn)"; return; }
-      st.textContent = "Probando conexión…"; st.style.color = "var(--text2)";
-      cfg.apiKey = key;
-      try {
-        if (binId) {
-          cfg.binId = binId;
-          const remote = await readBin();
-          cfg.mode = "synced"; saveCfg();
-          if (remote && remote.items) { data = remote; saveLocal(); render(); }
-          st.textContent = "✅ Conectado correctamente. Bin ID: " + cfg.binId; st.style.color = "var(--ok)";
-        } else {
-          cfg.binId = await createBin();
-          cfg.mode = "synced"; saveCfg();
-          st.textContent = "✅ Bin creado: " + cfg.binId + " — ¡Cópialo para compartir!"; st.style.color = "var(--ok)";
-          document.getElementById("tab-binid").value = cfg.binId;
-        }
-        document.getElementById("sync-bar").style.display = "flex";
-        setSyncStatus("synced", "Conectado · Bin: " + cfg.binId);
-        startAutoSync();
-        loadTabSettings();
-      } catch (e) {
-        st.textContent = "❌ Error: " + e.message; st.style.color = "var(--full)";
-      }
-    }
-
-    function disconnectTabSettings() {
-      if (!confirm("¿Desconectar de JSONBin? Los datos locales no se borran.")) return;
-      cfg = { apiKey: "", binId: "", mode: "local" }; saveCfg();
-      clearInterval(syncTimer);
-      document.getElementById("sync-bar").style.display = "none";
-      loadTabSettings();
-      showToast("Modo local activado");
-    }
-
-    // ============================================================
-    //  RENDER INVENTORY
-    // ============================================================
-    function populateFilters() {
-      const fLoc = document.getElementById("filter-loc");
-      const cur = fLoc.value;
-      fLoc.innerHTML = '<option value="">Todos los espacios</option>';
-      data.spaces.forEach(s => { const o = document.createElement("option"); o.value = s.id; o.textContent = s.icon + "  " + s.name; fLoc.appendChild(o); });
-      if (cur) fLoc.value = cur;
-      const fCat = document.getElementById("filter-cat");
-      if (fCat.children.length <= 1) CATS.forEach(c => { const o = document.createElement("option"); o.value = c.id; o.textContent = c.label; fCat.appendChild(o); });
-    }
-
-    function render() {
-      populateFilters();
-      const q = (document.getElementById("search").value || "").toLowerCase();
-      const fl = document.getElementById("filter-loc").value;
-      const fc = document.getElementById("filter-cat").value;
-      const filtered = data.items.filter(i =>
-        (!q || i.name.toLowerCase().includes(q) || (i.note || "").toLowerCase().includes(q)) &&
-        (!fl || i.loc === fl) && (!fc || i.cat === fc)
-      );
-      renderStats(filtered);
-      renderLocations(fl ? data.spaces.filter(s => s.id === fl) : data.spaces, filtered);
-    }
-
-    function renderStats(filtered) {
-      const qty = filtered.reduce((s, i) => s + (parseInt(i.qty) || 1), 0);
-      const locs = new Set(filtered.map(i => i.loc)).size;
-      const swd = data.spaces.filter(s => spaceVol(s) > 0);
-      const totalV = swd.reduce((s, sp) => s + spaceVol(sp), 0);
-      const usedV = swd.reduce((s, sp) => s + usedVol(sp.id), 0);
-      const occ = totalV > 0 ? Math.min(100, usedV / totalV * 100) : null;
-      document.getElementById("stats").innerHTML = [
-        { label: "Objetos", val: filtered.length, sub: "" },
-        { label: "Unidades", val: qty, sub: "" },
-        { label: "Espacios", val: locs + " / " + data.spaces.length, sub: "ocupados" },
-        occ != null
-          ? { label: "Ocupación global", val: occ.toFixed(0) + "%", sub: fmtV(usedV) + " de " + fmtV(totalV), c: occColor(occ) }
-          : { label: "Ocupación global", val: "—", sub: "Añade dimensiones", c: "" },
-      ].map(s => `<div class="stat"><div class="stat-label">${s.label}</div><div class="stat-val"${s.c ? ` style="color:${s.c}"` : ""}>${s.val}</div>${s.sub ? `<div class="stat-sub">${s.sub}</div>` : ""}</div>`).join("");
-    }
-
-    function renderLocations(locs, filtered) {
-      document.getElementById("locations").innerHTML = locs.map(loc => {
-        const locItems = filtered.filter(i => i.loc === loc.id);
-        const isOpen = collapsed[loc.id] !== true;
-        const occ = occData(loc);
-        const hasDims = spaceVol(loc) > 0;
-        const dimsStr = hasDims ? `${loc.w}×${loc.l}×${loc.h} cm` : "";
-
-        const occBarHTML = hasDims
-          ? `<div class="occ-wrap">
-          <div class="occ-bar-outer"><div class="occ-bar-inner" style="width:${occ.pct.toFixed(1)}%;background:${occColor(occ.pct)}"></div></div>
-          <span class="occ-pct" style="color:${occColor(occ.pct)}">${occ.pct.toFixed(0)}%</span>
-        </div>`
-          : `<span style="font-size:11px;color:var(--text3)">Sin dims</span>`;
-
-        const occDetailHTML = hasDims ? `<div class="loc-occ-detail">
-      <span>📦 <b>${fmtV(occ.uv)}</b> usado</span>
-      <span>🔓 <b>${fmtV(occ.sv - occ.uv)}</b> libre</span>
-      <span>📐 <b>${fmtV(occ.sv)}</b> total</span>
-      ${occ.withoutDims ? `<span style="color:var(--warn)">⚠ ${occ.withoutDims} sin dims</span>` : ""}
-    </div>`: "";
-
-        return `<div class="loc-group">
+ 
+    cfg.mode = "synced";
+    saveCfg();
+    renderConfigTab();
+    startAutoSync();
+    setSyncDot("ok","Conectado");
+    toast("✅ Sincronización activa · Bin: "+cfg.binId);
+    render();
+ 
+  } catch(e) {
+    cfgSetStatus("❌ "+e.message, "err");
+  } finally {
+    document.getElementById("btn-connect").disabled = false;
+  }
+}
+ 
+function cfgDisconnect() {
+  if (!confirm("¿Desconectar JSONBin? Los datos quedan guardados localmente.")) return;
+  cfg.mode = "local";
+  cfg.masterKey = "";
+  cfg.accessKey = "";
+  cfg.binId = "";
+  saveCfg();
+  clearInterval(autoTimer);
+  document.getElementById("sync-bar").style.display = "none";
+  setSyncDot("off","Sin conexión");
+  cfgSetStatus("Desconectado. Los datos siguen en este dispositivo.", "info");
+  renderConfigTab();
+  toast("Modo local activado");
+}
+ 
+function cfgClearLocal() {
+  if (!confirm("⚠️ ¿Borrar TODOS los datos locales? Esta acción no se puede deshacer.")) return;
+  data = defaultData();
+  saveLocal();
+  render();
+  toast("Datos locales borrados · Datos de ejemplo cargados.");
+}
+ 
+function copyBinId() {
+  navigator.clipboard.writeText(cfg.binId).then(()=>toast("📋 Bin ID copiado")).catch(()=>{
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = cfg.binId;
+    document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
+    toast("📋 Bin ID copiado");
+  });
+}
+ 
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
+let toastTimer;
+function toast(msg, isErr=false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.background = isErr ? "#dc2626" : "#2c2c2a";
+  t.style.color = "#fff";
+  t.style.opacity = "1";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.style.opacity="0", 3200);
+}
+ 
+// ─────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("panel-"+name).classList.add("active");
+  if (name==="graficos") renderCharts();
+  if (name==="espacios") renderSpaces();
+  if (name==="config")   renderConfigTab();
+}
+ 
+// ─────────────────────────────────────────────
+//  FILTERS
+// ─────────────────────────────────────────────
+function populateFilters() {
+  const fL=document.getElementById("filter-loc"), cur=fL.value;
+  fL.innerHTML='<option value="">Todos los espacios</option>';
+  data.spaces.forEach(s=>{const o=document.createElement("option");o.value=s.id;o.textContent=s.icon+"  "+s.name;fL.appendChild(o);});
+  if(cur) fL.value=cur;
+  const fC=document.getElementById("filter-cat");
+  if(fC.children.length<=1) CATS.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=c.label;fC.appendChild(o);});
+}
+ 
+// ─────────────────────────────────────────────
+//  RENDER INVENTORY
+// ─────────────────────────────────────────────
+function render() {
+  populateFilters();
+  const q=(document.getElementById("search").value||"").toLowerCase();
+  const fl=document.getElementById("filter-loc").value;
+  const fc=document.getElementById("filter-cat").value;
+  const f=data.items.filter(i=>
+    (!q||i.name.toLowerCase().includes(q)||(i.note||"").toLowerCase().includes(q))&&
+    (!fl||i.loc===fl)&&(!fc||i.cat===fc)
+  );
+  renderStats(f);
+  renderLocations(fl?data.spaces.filter(s=>s.id===fl):data.spaces, f);
+}
+ 
+function renderStats(f) {
+  const qty=f.reduce((s,i)=>s+(parseInt(i.qty)||1),0);
+  const locs=new Set(f.map(i=>i.loc)).size;
+  const swd=data.spaces.filter(s=>spVol(s)>0);
+  const tv=swd.reduce((s,sp)=>s+spVol(sp),0);
+  const uv=swd.reduce((s,sp)=>s+usedVol(sp.id),0);
+  const occ=tv>0?Math.min(100,uv/tv*100):null;
+  document.getElementById("stats").innerHTML=[
+    {label:"Objetos",val:f.length,sub:""},
+    {label:"Unidades",val:qty,sub:""},
+    {label:"Espacios",val:locs+" / "+data.spaces.length,sub:"ocupados"},
+    occ!=null
+      ?{label:"Ocupación global",val:occ.toFixed(0)+"%",sub:fmtV(uv)+" de "+fmtV(tv),c:occCl(occ)}
+      :{label:"Ocupación global",val:"—",sub:"Añade dimensiones",c:""},
+  ].map(s=>`<div class="stat"><div class="stat-label">${s.label}</div><div class="stat-val"${s.c?` style="color:${s.c}"`:""}>${s.val}</div>${s.sub?`<div class="stat-sub">${s.sub}</div>`:""}</div>`).join("");
+}
+ 
+function renderLocations(locs, filtered) {
+  document.getElementById("locations").innerHTML = locs.map(loc=>{
+    const li=filtered.filter(i=>i.loc===loc.id);
+    const isOpen=collapsed[loc.id]!==true;
+    const occ=occData(loc);
+    const hd=spVol(loc)>0;
+    const ds=hd?`${loc.w}×${loc.l}×${loc.h} cm`:"";
+    const occBar=hd
+      ?`<div class="occ-wrap"><div class="occ-bar-outer"><div class="occ-bar-inner" style="width:${occ.pct.toFixed(1)}%;background:${occCl(occ.pct)}"></div></div><span class="occ-pct" style="color:${occCl(occ.pct)}">${occ.pct.toFixed(0)}%</span></div>`
+      :`<span style="font-size:11px;color:var(--text3)">Sin dims</span>`;
+    const occDet=hd&&li.length>0?`<div class="loc-occ-detail"><span>📦 <b>${fmtV(occ.uv)}</b> usado</span><span>🔓 <b>${fmtV(occ.sv-occ.uv)}</b> libre</span><span>📐 <b>${fmtV(occ.sv)}</b> total</span>${occ.noDims?`<span style="color:var(--warn)">⚠ ${occ.noDims} sin dims</span>`:""}</div>`:"";
+    return `<div class="loc-group">
       <div class="loc-header" onclick="toggleLoc('${loc.id}')">
-        <div class="loc-icon-wrap" style="background:${loc.color || "#f1f5f9"}">${loc.icon || "📦"}</div>
+        <div class="loc-icon-wrap" style="background:${loc.color||"#f1f5f9"}">${loc.icon||"📦"}</div>
         <div class="loc-info">
           <div class="loc-name">${esc(loc.name)}</div>
-          <div class="loc-dims">${esc(loc.desc || "")}${loc.desc && dimsStr ? " · " : ""}${dimsStr}</div>
+          <div class="loc-dims">${esc(loc.desc||"")}${loc.desc&&ds?" · ":""}${ds}</div>
         </div>
-        <div class="loc-right">
-          ${occBarHTML}
-          <span class="loc-count">${locItems.length}</span>
+        <div class="loc-right">${occBar}<span class="loc-count">${li.length}</span>
           <button class="loc-edit-btn" onclick="event.stopPropagation();openSpaceModal('${loc.id}')">✏</button>
-          <span class="chevron ${isOpen ? "open" : ""}">▼</span>
+          <span class="chevron ${isOpen?"open":""}">▼</span>
         </div>
       </div>
-      ${isOpen ? `<div class="loc-body">
-        ${hasDims && locItems.length > 0 ? occDetailHTML : ""}
-        ${locItems.length === 0
-              ? `<p class="empty-loc">Sin objetos aquí. <a onclick="openItemModalFor('${loc.id}')">Añadir uno</a></p>`
-              : `<div class="items-grid">${locItems.map(renderItem).join("")}</div>`}
-      </div>`: ""}
+      ${isOpen?`<div class="loc-body">${occDet}${li.length===0
+        ?`<p class="empty-loc">Sin objetos. <a onclick="openItemModalFor('${loc.id}')">Añadir uno</a></p>`
+        :`<div class="items-grid">${li.map(renderItem).join("")}</div>`}</div>`:""}
     </div>`;
-      }).join("");
-    }
-
-    function renderItem(item) {
-      const c = catOf(item.cat);
-      const v = vol(item.w, item.l, item.h);
-      const tv = v * (parseInt(item.qty) || 1);
-      const dimsStr = v ? `${item.w}×${item.l}×${item.h} cm${item.qty > 1 ? " × " + item.qty + " = " + fmtV(tv) : ""}` : ""
-      return `<div class="item-card">
-    <div class="item-actions"><button class="btn-icon" title="Editar" onclick="openItemModalFor(null,'${item.id}')">✏</button></div>
+  }).join("");
+}
+ 
+function renderItem(item) {
+  const c=catOf(item.cat);
+  const v=vol3(item.w,item.l,item.h);
+  const tv=v*(parseInt(item.qty)||1);
+  const ds=v?`${item.w}×${item.l}×${item.h} cm${item.qty>1?" × "+item.qty+" = "+fmtV(tv):""}`:""
+  return `<div class="item-card">
+    <div class="item-actions"><button class="btn-icon" onclick="openItemModalFor(null,'${item.id}')">✏</button></div>
     <div class="item-name">${esc(item.name)}</div>
     <div class="item-meta-row">
       <span class="badge" style="background:${c.bg};color:${c.tc}">${c.label}</span>
-      ${item.qty > 1 ? `<span class="item-qty">× ${item.qty}</span>` : ""}
+      ${item.qty>1?`<span class="item-qty">× ${item.qty}</span>`:""}
     </div>
-    ${dimsStr ? `<div class="item-vol">📐 ${dimsStr}</div>` : ""}
-    ${item.note ? `<div class="item-note">${esc(item.note)}</div>` : ""}
+    ${ds?`<div class="item-vol">📐 ${ds}</div>`:""}
+    ${item.note?`<div class="item-note">${esc(item.note)}</div>`:""}
   </div>`;
-    }
-
-    function toggleLoc(id) { collapsed[id] = !collapsed[id]; render(); }
-
-    // ============================================================
-    //  ITEM MODAL
-    // ============================================================
-    function openItemModal() { openItemModalFor(null, null); }
-    function openItemModalFor(defaultLoc, editId) {
-      editingItemId = editId || null;
-      const item = editId ? data.items.find(i => i.id === editId) : null;
-      document.getElementById("item-modal-title").textContent = item ? "Editar objeto" : "Añadir objeto";
-      const mLoc = document.getElementById("f-loc");
-      mLoc.innerHTML = data.spaces.map(s => `<option value="${s.id}">${s.icon} ${esc(s.name)}</option>`).join("");
-      document.getElementById("f-cat").innerHTML = CATS.map(c => `<option value="${c.id}">${c.label}</option>`).join("");
-      document.getElementById("f-name").value = item ? item.name : "";
-      mLoc.value = item ? item.loc : (defaultLoc || data.spaces[0]?.id || "");
-      document.getElementById("f-cat").value = item ? item.cat : CATS[0].id;
-      document.getElementById("f-qty").value = item ? item.qty : 1;
-      document.getElementById("f-w").value = item && item.w ? item.w : "";
-      document.getElementById("f-l").value = item && item.l ? item.l : "";
-      document.getElementById("f-h").value = item && item.h ? item.h : "";
-      document.getElementById("f-note").value = item ? (item.note || "") : "";
-      document.getElementById("item-danger").style.display = item ? "block" : "none";
-      updateItemVolPreview();
-      document.getElementById("overlay-item").classList.add("show");
-      document.getElementById("f-name").focus();
-    }
-    function closeItemModal() { document.getElementById("overlay-item").classList.remove("show"); }
-
-    function updateItemVolPreview() {
-      const w = num(document.getElementById("f-w").value);
-      const l = num(document.getElementById("f-l").value);
-      const h = num(document.getElementById("f-h").value);
-      const qty = parseInt(document.getElementById("f-qty").value) || 1;
-      const div = document.getElementById("item-vol-preview");
-      if (w > 0 && l > 0 && h > 0) { div.style.display = "block"; div.textContent = `📦 ${fmtV(w * l * h)} por unidad${qty > 1 ? " · Total: " + fmtV(w * l * h * qty) : ""}`; } else div.style.display = "none";
-    }
-
-    async function saveItemModal() {
-      const name = document.getElementById("f-name").value.trim();
-      if (!name) { document.getElementById("f-name").focus(); return; }
-      const d = {
-        name, loc: document.getElementById("f-loc").value, cat: document.getElementById("f-cat").value,
-        qty: parseInt(document.getElementById("f-qty").value) || 1,
-        w: num(document.getElementById("f-w").value) || "", l: num(document.getElementById("f-l").value) || "", h: num(document.getElementById("f-h").value) || "",
-        note: document.getElementById("f-note").value.trim()
-      };
-      if (editingItemId) { const idx = data.items.findIndex(i => i.id === editingItemId); if (idx >= 0) data.items[idx] = { ...data.items[idx], ...d }; }
-      else data.items.push({ id: uid(), ...d });
-      closeItemModal();
-      await saveAndSync();
-    }
-
-    async function deleteCurrentItem() {
-      if (!confirm("¿Eliminar este objeto?")) return;
-      data.items = data.items.filter(i => i.id !== editingItemId);
-      closeItemModal();
-      await saveAndSync();
-    }
-
-    // ============================================================
-    //  SPACE MODAL
-    // ============================================================
-    function openSpaceModal(editId) {
-      editingSpaceId = editId || null;
-      const sp = editId ? data.spaces.find(s => s.id === editId) : null;
-      document.getElementById("space-modal-title").textContent = sp ? "Editar espacio" : "Nuevo espacio";
-      document.getElementById("s-name").value = sp ? sp.name : "";
-      document.getElementById("s-desc").value = sp ? (sp.desc || "") : "";
-      document.getElementById("s-w").value = sp && sp.w ? sp.w : "";
-      document.getElementById("s-l").value = sp && sp.l ? sp.l : "";
-      document.getElementById("s-h").value = sp && sp.h ? sp.h : "";
-      selIcon = sp ? sp.icon : "📦"; selColor = sp ? sp.color : "#f1f5f9";
-      buildIconPicker(); buildColorPicker();
-      document.getElementById("space-danger").style.display = (sp && !data.items.some(i => i.loc === sp.id)) ? "block" : "none";
-      updateSpaceVolPreview();
-      document.getElementById("overlay-space").classList.add("show");
-      document.getElementById("s-name").focus();
-    }
-    function closeSpaceModal() { document.getElementById("overlay-space").classList.remove("show"); }
-
-    function updateSpaceVolPreview() {
-      const w = num(document.getElementById("s-w").value), l = num(document.getElementById("s-l").value), h = num(document.getElementById("s-h").value);
-      const div = document.getElementById("space-vol-preview");
-      if (w > 0 && l > 0 && h > 0) { div.style.display = "block"; div.textContent = `📐 Volumen total: ${fmtV(w * l * h)}`; } else div.style.display = "none";
-    }
-
-    function buildIconPicker() {
-      document.getElementById("icon-picker").innerHTML = ICONS.map(ico => `<div class="icon-option${ico === selIcon ? " sel" : ""}" onclick="pickIcon('${ico}')">${ico}</div>`).join("");
-    }
-    function buildColorPicker() {
-      document.getElementById("color-picker").innerHTML = COLORS.map(c => `<div class="color-swatch${c === selColor ? " sel" : ""}" style="background:${c};border-color:${c === selColor ? "#2c2c2a" : c}" onclick="pickColor('${c}')"></div>`).join("");
-    }
-    function pickIcon(ico) { selIcon = ico; buildIconPicker(); }
-    function pickColor(c) { selColor = c; buildColorPicker(); }
-
-    async function saveSpaceModal() {
-      const name = document.getElementById("s-name").value.trim();
-      if (!name) { document.getElementById("s-name").focus(); return; }
-      const d = {
-        name, desc: document.getElementById("s-desc").value.trim(), icon: selIcon, color: selColor,
-        w: num(document.getElementById("s-w").value) || "", l: num(document.getElementById("s-l").value) || "", h: num(document.getElementById("s-h").value) || ""
-      };
-      if (editingSpaceId) { const idx = data.spaces.findIndex(s => s.id === editingSpaceId); if (idx >= 0) data.spaces[idx] = { ...data.spaces[idx], ...d }; }
-      else data.spaces.push({ id: uid(), ...d });
-      closeSpaceModal();
-      await saveAndSync();
-      renderSpaces();
-    }
-
-    async function deleteCurrentSpace() {
-      if (data.items.some(i => i.loc === editingSpaceId)) { alert("Mueve o elimina primero los objetos."); return; }
-      if (!confirm("¿Eliminar este espacio?")) return;
-      data.spaces = data.spaces.filter(s => s.id !== editingSpaceId);
-      closeSpaceModal();
-      await saveAndSync();
-      renderSpaces();
-    }
-
-    // ============================================================
-    //  SPACES TAB
-    // ============================================================
-    function renderSpaces() {
-      document.getElementById("spaces-grid").innerHTML =
-        data.spaces.map(sp => {
-          const occ = occData(sp); const sv = spaceVol(sp);
-          const dimsStr = sv ? `${sp.w}×${sp.l}×${sp.h} cm · ${fmtV(sv)}` : "Sin dimensiones";
-          const occRow = sv
-            ? `<div class="sc-occ-row"><div class="sc-occ-bar-outer"><div class="sc-occ-bar-inner" style="width:${occ.pct.toFixed(1)}%;background:${occColor(occ.pct)}"></div></div><div class="sc-occ-label" style="color:${occColor(occ.pct)}">${occ.pct.toFixed(0)}% ocupado · ${fmtV(occ.sv - occ.uv)} libre</div></div>`
-            : `<div class="sc-occ-row"><div class="sc-occ-label">Sin dims → sin % ocupación</div></div>`;
-          return `<div class="space-card">
+}
+ 
+function toggleLoc(id){collapsed[id]=!collapsed[id];render();}
+ 
+// ─────────────────────────────────────────────
+//  ITEM MODAL
+// ─────────────────────────────────────────────
+function openItemModal(){openItemModalFor(null,null);}
+function openItemModalFor(defLoc, editId) {
+  editingItemId = editId||null;
+  const item = editId ? data.items.find(i=>i.id===editId) : null;
+  document.getElementById("item-modal-title").textContent = item?"Editar objeto":"Añadir objeto";
+  const mL=document.getElementById("f-loc");
+  mL.innerHTML=data.spaces.map(s=>`<option value="${s.id}">${s.icon} ${esc(s.name)}</option>`).join("");
+  document.getElementById("f-cat").innerHTML=CATS.map(c=>`<option value="${c.id}">${c.label}</option>`).join("");
+  document.getElementById("f-name").value=item?item.name:"";
+  mL.value=item?item.loc:(defLoc||data.spaces[0]?.id||"");
+  document.getElementById("f-cat").value=item?item.cat:CATS[0].id;
+  document.getElementById("f-qty").value=item?item.qty:1;
+  document.getElementById("f-w").value=item&&item.w?item.w:"";
+  document.getElementById("f-l").value=item&&item.l?item.l:"";
+  document.getElementById("f-h").value=item&&item.h?item.h:"";
+  document.getElementById("f-note").value=item?(item.note||""):"";
+  document.getElementById("item-danger").style.display=item?"block":"none";
+  updateItemVolPrev();
+  document.getElementById("overlay-item").classList.add("show");
+  setTimeout(()=>document.getElementById("f-name").focus(),50);
+}
+function closeItemModal(){document.getElementById("overlay-item").classList.remove("show");}
+ 
+function updateItemVolPrev() {
+  const w=n(document.getElementById("f-w").value);
+  const l=n(document.getElementById("f-l").value);
+  const h=n(document.getElementById("f-h").value);
+  const qty=parseInt(document.getElementById("f-qty").value)||1;
+  const d=document.getElementById("item-vol-prev");
+  if(w>0&&l>0&&h>0){d.style.display="block";d.textContent=`📦 ${fmtV(w*l*h)} por unidad${qty>1?" · Total: "+fmtV(w*l*h*qty):""}"`;}
+  else d.style.display="none";
+}
+ 
+async function saveItemModal() {
+  const name=document.getElementById("f-name").value.trim();
+  if(!name){document.getElementById("f-name").focus();return;}
+  const d={name,
+    loc:document.getElementById("f-loc").value,
+    cat:document.getElementById("f-cat").value,
+    qty:parseInt(document.getElementById("f-qty").value)||1,
+    w:n(document.getElementById("f-w").value)||"",
+    l:n(document.getElementById("f-l").value)||"",
+    h:n(document.getElementById("f-h").value)||"",
+    note:document.getElementById("f-note").value.trim()};
+  if(editingItemId){const idx=data.items.findIndex(i=>i.id===editingItemId);if(idx>=0)data.items[idx]={...data.items[idx],...d};}
+  else data.items.push({id:uid(),...d});
+  closeItemModal();
+  await saveAndSync();
+}
+ 
+async function deleteCurrentItem() {
+  if(!confirm("¿Eliminar este objeto?"))return;
+  data.items=data.items.filter(i=>i.id!==editingItemId);
+  closeItemModal();
+  await saveAndSync();
+}
+ 
+// ─────────────────────────────────────────────
+//  SPACE MODAL
+// ─────────────────────────────────────────────
+function openSpaceModal(editId) {
+  editingSpaceId=editId||null;
+  const sp=editId?data.spaces.find(s=>s.id===editId):null;
+  document.getElementById("space-modal-title").textContent=sp?"Editar espacio":"Nuevo espacio";
+  document.getElementById("s-name").value=sp?sp.name:"";
+  document.getElementById("s-desc").value=sp?(sp.desc||""):"";
+  document.getElementById("s-w").value=sp&&sp.w?sp.w:"";
+  document.getElementById("s-l").value=sp&&sp.l?sp.l:"";
+  document.getElementById("s-h").value=sp&&sp.h?sp.h:"";
+  selIcon=sp?sp.icon:"📦"; selColor=sp?sp.color:"#f1f5f9";
+  buildIconPicker(); buildColorPicker();
+  document.getElementById("space-danger").style.display=(sp&&!data.items.some(i=>i.loc===sp.id))?"block":"none";
+  updateSpaceVolPrev();
+  document.getElementById("overlay-space").classList.add("show");
+  setTimeout(()=>document.getElementById("s-name").focus(),50);
+}
+function closeSpaceModal(){document.getElementById("overlay-space").classList.remove("show");}
+ 
+function updateSpaceVolPrev() {
+  const w=n(document.getElementById("s-w").value),l=n(document.getElementById("s-l").value),h=n(document.getElementById("s-h").value);
+  const d=document.getElementById("space-vol-prev");
+  if(w>0&&l>0&&h>0){d.style.display="block";d.textContent=`📐 Volumen total: ${fmtV(w*l*h)}`;}
+  else d.style.display="none";
+}
+ 
+function buildIconPicker(){
+  document.getElementById("icon-picker").innerHTML=ICONS.map(ico=>
+    `<div class="icon-option${ico===selIcon?" sel":""}" onclick="pickIcon('${ico}')">${ico}</div>`).join("");
+}
+function buildColorPicker(){
+  document.getElementById("color-picker").innerHTML=CLRS.map(c=>
+    `<div class="color-swatch${c===selColor?" sel":""}" style="background:${c};border-color:${c===selColor?"#2c2c2a":c}" onclick="pickColor('${c}')"></div>`).join("");
+}
+function pickIcon(ico){selIcon=ico;buildIconPicker();}
+function pickColor(c){selColor=c;buildColorPicker();}
+ 
+async function saveSpaceModal() {
+  const name=document.getElementById("s-name").value.trim();
+  if(!name){document.getElementById("s-name").focus();return;}
+  const d={name,desc:document.getElementById("s-desc").value.trim(),icon:selIcon,color:selColor,
+    w:n(document.getElementById("s-w").value)||"",
+    l:n(document.getElementById("s-l").value)||"",
+    h:n(document.getElementById("s-h").value)||""};
+  if(editingSpaceId){const idx=data.spaces.findIndex(s=>s.id===editingSpaceId);if(idx>=0)data.spaces[idx]={...data.spaces[idx],...d};}
+  else data.spaces.push({id:uid(),...d});
+  closeSpaceModal();
+  await saveAndSync();
+  renderSpaces();
+}
+ 
+async function deleteCurrentSpace() {
+  if(data.items.some(i=>i.loc===editingSpaceId)){alert("Mueve o elimina primero los objetos de este espacio.");return;}
+  if(!confirm("¿Eliminar este espacio?"))return;
+  data.spaces=data.spaces.filter(s=>s.id!==editingSpaceId);
+  closeSpaceModal();
+  await saveAndSync();
+  renderSpaces();
+}
+ 
+// ─────────────────────────────────────────────
+//  SPACES TAB
+// ─────────────────────────────────────────────
+function renderSpaces() {
+  document.getElementById("spaces-grid").innerHTML=
+    data.spaces.map(sp=>{
+      const occ=occData(sp);const sv=spVol(sp);
+      const dt=sv?`${sp.w}×${sp.l}×${sp.h} cm · ${fmtV(sv)}`:"Sin dimensiones";
+      const occRow=sv
+        ?`<div class="sc-occ-row"><div class="sc-occ-bar-outer"><div class="sc-occ-bar-inner" style="width:${occ.pct.toFixed(1)}%;background:${occCl(occ.pct)}"></div></div><div class="sc-occ-label" style="color:${occCl(occ.pct)}">${occ.pct.toFixed(0)}% ocupado · ${fmtV(occ.sv-occ.uv)} libre</div></div>`
+        :`<div class="sc-occ-row"><div class="sc-occ-label" style="color:var(--text3)">Sin dims → sin % ocupación</div></div>`;
+      return `<div class="space-card">
         <div class="sc-actions"><button class="btn-icon" onclick="openSpaceModal('${sp.id}')">✏</button></div>
-        <div class="sc-icon" style="background:${sp.color || "#f1f5f9"}">${sp.icon || "📦"}</div>
+        <div class="sc-icon" style="background:${sp.color||"#f1f5f9"}">${sp.icon||"📦"}</div>
         <div class="sc-info">
           <div class="sc-name">${esc(sp.name)}</div>
-          ${sp.desc ? `<div class="sc-desc">${esc(sp.desc)}</div>` : ""}
-          <div class="sc-dims-tag">${dimsStr}</div>
-          ${occRow}
+          ${sp.desc?`<div class="sc-desc">${esc(sp.desc)}</div>`:""}
+          <div class="sc-dims-tag">${dt}</div>${occRow}
         </div>
       </div>`;
-        }).join("") +
-        `<div class="add-space-card" onclick="openSpaceModal()"><span style="font-size:24px">＋</span><span style="font-size:12px;color:var(--text2)">Nuevo espacio</span></div>`;
-    }
-
-    // ============================================================
-    //  CHARTS
-    // ============================================================
-    function renderCharts() {
-      const c = document.getElementById("charts-grid");
-      if (!data.items.length) { c.innerHTML = '<p class="chart-empty">Añade objetos para ver estadísticas.</p>'; return; }
-      c.innerHTML = `
-    <div class="chart-card" id="c-occ"></div>
-    <div class="chart-card" id="c-cats"></div>
-    <div class="chart-card" id="c-items"></div>
-    <div class="chart-card" id="c-vol"></div>`;
-      buildOccChart(); buildCatsChart(); buildItemsChart(); buildVolChart();
-    }
-
-    function buildOccChart() {
-      const swd = data.spaces.filter(s => spaceVol(s) > 0);
-      if (!swd.length) { document.getElementById("c-occ").innerHTML = `<div class="chart-title">🏗 Ocupación por espacio</div><p class="chart-empty">Añade dimensiones a los espacios.</p>`; return; }
-      const totalSV = swd.reduce((s, sp) => s + spaceVol(sp), 0);
-      const totalUV = swd.reduce((s, sp) => s + usedVol(sp.id), 0);
-      const gp = Math.min(100, totalUV / totalSV * 100);
-      document.getElementById("c-occ").innerHTML =
-        `<div class="chart-title">🏗 Ocupación por espacio</div>` +
-        swd.map(sp => {
-          const occ = occData(sp); const pct = occ.pct; const col = occColor(pct);
-          return `<div class="occ-summary-row">
-        <div class="occ-summary-label" title="${sp.name}">${sp.icon} ${sp.name}</div>
-        <div class="occ-summary-track"><div class="occ-fill-used" style="width:${pct.toFixed(1)}%;background:${col};opacity:.85"></div></div>
-        <div class="occ-summary-pct" style="color:${col}">${pct.toFixed(0)}%</div>
-      </div>`;
-        }).join("") +
-        `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px">
-      <span style="color:var(--text2)">${fmtV(totalUV)} de ${fmtV(totalSV)}</span>
-      <span style="font-weight:600;color:${occColor(gp)}">${gp.toFixed(0)}% global</span>
+    }).join("")+
+    `<div class="add-space-card" onclick="openSpaceModal()">
+      <span style="font-size:24px">＋</span>
+      <span style="font-size:12px;color:var(--text2)">Nuevo espacio</span>
     </div>`;
+}
+ 
+// ─────────────────────────────────────────────
+//  CHARTS
+// ─────────────────────────────────────────────
+function renderCharts() {
+  const c=document.getElementById("charts-grid");
+  if(!data.items.length){c.innerHTML='<p class="chart-empty">Añade objetos para ver estadísticas.</p>';return;}
+  c.innerHTML=`<div class="chart-card" id="c-occ"></div><div class="chart-card" id="c-cats"></div><div class="chart-card" id="c-items"></div><div class="chart-card" id="c-vol"></div>`;
+  buildOccChart(); buildCatsChart(); buildItemsChart(); buildVolChart();
+}
+ 
+function buildOccChart() {
+  const swd=data.spaces.filter(s=>spVol(s)>0);
+  if(!swd.length){document.getElementById("c-occ").innerHTML=`<div class="chart-title">🏗 Ocupación por espacio</div><p class="chart-empty">Añade dimensiones a los espacios.</p>`;return;}
+  const tv=swd.reduce((s,sp)=>s+spVol(sp),0);
+  const uv=swd.reduce((s,sp)=>s+usedVol(sp.id),0);
+  const gp=Math.min(100,uv/tv*100);
+  document.getElementById("c-occ").innerHTML=`<div class="chart-title">🏗 Ocupación por espacio</div>`+
+    swd.map(sp=>{const occ=occData(sp);const pct=occ.pct;const col=occCl(pct);
+      return `<div class="occ-sum-row"><div class="occ-sum-label" title="${sp.name}">${sp.icon} ${sp.name}</div>
+        <div class="occ-sum-track"><div class="occ-fill" style="width:${pct.toFixed(1)}%;background:${col};opacity:.85"></div></div>
+        <div class="occ-sum-pct" style="color:${col}">${pct.toFixed(0)}%</div></div>`;}).join("")+
+    `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px">
+      <span style="color:var(--text2)">${fmtV(uv)} de ${fmtV(tv)}</span>
+      <span style="font-weight:600;color:${occCl(gp)}">${gp.toFixed(0)}% global</span></div>`;
+}
+ 
+function buildCatsChart() {
+  const counts={};CATS.forEach(c=>counts[c.id]=0);
+  data.items.forEach(i=>{if(counts[i.cat]!==undefined)counts[i.cat]++;});
+  const total=data.items.length||1;
+  const sorted=CATS.map(c=>({c,n:counts[c.id]})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const cid="donut"+Date.now();
+  const legend=sorted.map(({c,n})=>`<div class="legend-row"><div class="legend-dot" style="background:${c.bg};outline:1px solid ${c.tc}44"></div><span>${c.label}</span><span style="margin-left:auto;font-weight:600;color:var(--text)">${n}</span></div>`).join("");
+  document.getElementById("c-cats").innerHTML=`<div class="chart-title">🏷 Por categoría</div><div class="donut-wrap"><canvas id="${cid}" width="110" height="110" style="flex-shrink:0"></canvas><div class="donut-legend">${legend}</div></div>`;
+  requestAnimationFrame(()=>{
+    const cv=document.getElementById(cid);if(!cv)return;
+    const ctx=cv.getContext("2d");let st=-Math.PI/2;const cx=55,cy=55,r=50,ir=30;
+    sorted.forEach(({c,n})=>{const e=st+(n/total)*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,st,e);ctx.closePath();ctx.fillStyle=c.bg;ctx.fill();st=e;});
+    ctx.beginPath();ctx.arc(cx,cy,ir,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();
+    ctx.fillStyle="#2c2c2a";ctx.font="bold 14px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(data.items.length,cx,cy-7);
+    ctx.fillStyle="#888780";ctx.font="10px sans-serif";ctx.fillText("objetos",cx,cy+8);
+  });
+}
+ 
+function buildItemsChart() {
+  const counts={};data.spaces.forEach(s=>counts[s.id]=0);data.items.forEach(i=>{if(counts[i.loc]!==undefined)counts[i.loc]++;});
+  const sorted=data.spaces.map(s=>({s,n:counts[s.id]||0})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const max=sorted[0]?.n||1;
+  document.getElementById("c-items").innerHTML=`<div class="chart-title">📍 Objetos por espacio</div>`+
+    sorted.map(({s,n})=>`<div class="bar-row"><div class="bar-label" title="${s.name}">${s.icon} ${s.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/max*100)}%;background:${s.color||"#e0ddd5"}"></div></div><div class="bar-num">${n}</div></div>`).join("");
+}
+ 
+function buildVolChart() {
+  const vols={};CATS.forEach(c=>vols[c.id]=0);
+  data.items.forEach(i=>{const v=vol3(i.w,i.l,i.h)*(parseInt(i.qty)||1);if(vols[i.cat]!==undefined)vols[i.cat]+=v;});
+  const sorted=CATS.map(c=>({c,v:vols[c.id]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  if(!sorted.length){document.getElementById("c-vol").innerHTML=`<div class="chart-title">📦 Volumen por categoría</div><p class="chart-empty">Añade dimensiones a los objetos.</p>`;return;}
+  const maxV=sorted[0].v;
+  document.getElementById("c-vol").innerHTML=`<div class="chart-title">📦 Volumen por categoría</div>`+
+    sorted.map(({c,v})=>`<div class="bar-row"><div class="bar-label">${c.label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxV*100)}%;background:${c.bg}"></div></div><div class="bar-num" style="font-size:10px">${fmtV(v)}</div></div>`).join("");
+}
+ 
+// ─────────────────────────────────────────────
+//  EXPORT / IMPORT  — CSV FIX: data URI
+// ─────────────────────────────────────────────
+function exportCSV() {
+  const rows = [["Nombre","Espacio","Categoría","Cantidad","Ancho (cm)","Largo (cm)","Alto (cm)","Volumen","Nota"]];
+  data.items.forEach(i => {
+    const loc = data.spaces.find(s=>s.id===i.loc)?.name || i.loc;
+    const cat = CATS.find(c=>c.id===i.cat)?.label || i.cat;
+    const v   = vol3(i.w, i.l, i.h);
+    rows.push([i.name, loc, cat, i.qty, i.w||"", i.l||"", i.h||"", v?fmtV(v):"", i.note||""]);
+  });
+  const csv = "\uFEFF" + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  // Use data URI — more reliable than createObjectURL in embedded contexts
+  const uri = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  const a = document.createElement("a");
+  a.setAttribute("href", uri);
+  a.setAttribute("download", "almacenamiento_hogar.csv");
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast("✅ CSV descargado");
+}
+ 
+function exportJSON() {
+  const json = JSON.stringify(data, null, 2);
+  const uri = "data:application/json;charset=utf-8," + encodeURIComponent(json);
+  const a = document.createElement("a");
+  a.setAttribute("href", uri);
+  a.setAttribute("download", "almacenamiento_hogar.json");
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast("✅ JSON descargado");
+}
+ 
+function importJSON() {
+  document.getElementById("import-file").click();
+}
+ 
+function handleImport(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.items || !imported.spaces) throw new Error("Formato no válido");
+      if (!confirm(`¿Importar ${imported.items.length} objetos y ${imported.spaces.length} espacios? Se reemplazarán los datos actuales.`)) return;
+      data = imported;
+      await saveAndSync();
+      render();
+      toast("✅ Datos importados correctamente");
+    } catch(err) {
+      toast("❌ Error al importar: "+err.message, true);
     }
-
-    function buildCatsChart() {
-      const counts = {}; CATS.forEach(c => counts[c.id] = 0);
-      data.items.forEach(i => { if (counts[i.cat] !== undefined) counts[i.cat]++; });
-      const total = data.items.length || 1;
-      const sorted = CATS.map(c => ({ c, n: counts[c.id] })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
-      const cid = "donut" + Date.now();
-      const legend = sorted.map(({ c, n }) => `<div class="legend-row"><div class="legend-dot" style="background:${c.bg};outline:1px solid ${c.tc}44"></div><span>${c.label}</span><span style="margin-left:auto;font-weight:600;color:var(--text)">${n}</span></div>`).join("");
-      document.getElementById("c-cats").innerHTML = `<div class="chart-title">🏷 Por categoría</div><div class="donut-wrap"><canvas id="${cid}" width="110" height="110" style="flex-shrink:0"></canvas><div class="donut-legend">${legend}</div></div>`;
-      requestAnimationFrame(() => {
-        const canvas = document.getElementById(cid); if (!canvas) return;
-        const ctx = canvas.getContext("2d"); let start = -Math.PI / 2; const cx = 55, cy = 55, r = 50, ir = 30;
-        sorted.forEach(({ c, n }) => { const end = start + (n / total) * Math.PI * 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, end); ctx.closePath(); ctx.fillStyle = c.bg; ctx.fill(); start = end; });
-        ctx.beginPath(); ctx.arc(cx, cy, ir, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
-        ctx.fillStyle = "#2c2c2a"; ctx.font = "bold 14px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(data.items.length, cx, cy - 7);
-        ctx.fillStyle = "#888780"; ctx.font = "10px sans-serif"; ctx.fillText("objetos", cx, cy + 8);
-      });
-    }
-
-    function buildItemsChart() {
-      const counts = {}; data.spaces.forEach(s => counts[s.id] = 0); data.items.forEach(i => { if (counts[i.loc] !== undefined) counts[i.loc]++; });
-      const sorted = data.spaces.map(s => ({ s, n: counts[s.id] || 0 })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
-      const max = sorted[0]?.n || 1;
-      document.getElementById("c-items").innerHTML = `<div class="chart-title">📍 Objetos por espacio</div>` +
-        sorted.map(({ s, n }) => `<div class="bar-row"><div class="bar-label" title="${s.name}">${s.icon} ${s.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n / max * 100)}%;background:${s.color || "#e0ddd5"}"></div></div><div class="bar-num">${n}</div></div>`).join("");
-    }
-
-    function buildVolChart() {
-      const vols = {}; CATS.forEach(c => vols[c.id] = 0);
-      data.items.forEach(i => { const v = vol(i.w, i.l, i.h) * (parseInt(i.qty) || 1); if (vols[i.cat] !== undefined) vols[i.cat] += v; });
-      const sorted = CATS.map(c => ({ c, v: vols[c.id] })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
-      if (!sorted.length) { document.getElementById("c-vol").innerHTML = `<div class="chart-title">📦 Volumen por categoría</div><p class="chart-empty">Añade dimensiones a los objetos.</p>`; return; }
-      const maxV = sorted[0].v;
-      document.getElementById("c-vol").innerHTML = `<div class="chart-title">📦 Volumen por categoría</div>` +
-        sorted.map(({ c, v }) => `<div class="bar-row"><div class="bar-label">${c.label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${c.bg}"></div></div><div class="bar-num" style="font-size:10px">${fmtV(v)}</div></div>`).join("");
-    }
-
-    // ============================================================
-    //  EXPORT
-    // ============================================================
-    function exportCSV() {
-      const rows = [["Nombre", "Espacio", "Categoría", "Cantidad", "Ancho", "Largo", "Alto", "Volumen", "Nota"]];
-      data.items.forEach(i => {
-        const loc = data.spaces.find(s => s.id === i.loc)?.name || i.loc;
-        const c = CATS.find(c => c.id === i.cat)?.label || i.cat;
-        const v = vol(i.w, i.l, i.h);
-        rows.push([i.name, loc, c, i.qty, i.w || "", i.l || "", i.h || "", v ? fmtV(v) : "", i.note || ""]);
-      });
-      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
-      // Usar data URI en vez de Blob URL (compatible con HTML local abierto con file://)
-      const dataUri = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
-      const a = document.createElement("a");
-      a.href = dataUri;
-      a.download = "almacenamiento_hogar.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      showToast("✅ CSV descargado");
-    }
-
-    // ============================================================
-    //  DEFAULT DATA
-    // ============================================================
-    function defaultData() {
-      return {
-        spaces: [
-          { id: "cama", name: "Bajo la cama", desc: "Cajas y fundas", icon: "🛏️", color: "#fef3c7", w: 190, l: 140, h: 30 },
-          { id: "arm_dorm", name: "Armario dormitorio", desc: "Ropa y complementos", icon: "🚪", color: "#dbeafe", w: 180, l: 60, h: 220 },
-          { id: "arm_pasillo", name: "Armario pasillo", desc: "Abrigos y bolsas", icon: "🚪", color: "#ede9fe", w: 120, l: 55, h: 200 },
-          { id: "tras_e1", name: "Trastero · Estantería 1", desc: "Herramientas", icon: "📦", color: "#dcfce7", w: 100, l: 40, h: 40 },
-          { id: "tras_e2", name: "Trastero · Estantería 2", desc: "Electrónica", icon: "📦", color: "#dcfce7", w: 100, l: 40, h: 40 },
-          { id: "tras_e3", name: "Trastero · Estantería 3", desc: "Cajas varias", icon: "📦", color: "#dcfce7", w: 100, l: 40, h: 40 },
-          { id: "tras_suelo", name: "Trastero · Suelo", desc: "Objetos grandes", icon: "🗄️", color: "#f1f5f9", w: "", l: "", h: "" },
-        ],
-        items: [
-          { id: uid(), name: "Ropa de invierno", loc: "cama", cat: "ropa", qty: 3, note: "Cajas plástico azules", w: 60, l: 40, h: 20 },
-          { id: uid(), name: "Mantas extra", loc: "arm_dorm", cat: "ropa", qty: 2, note: "Estante superior", w: 50, l: 30, h: 15 },
-          { id: uid(), name: "Sábanas 90 cm", loc: "arm_dorm", cat: "ropa", qty: 3, note: "", w: 40, l: 30, h: 10 },
-          { id: uid(), name: "Taladro + brocas", loc: "tras_e1", cat: "herramientas", qty: 1, note: "Caja negra pequeña", w: 35, l: 15, h: 15 },
-          { id: uid(), name: "Cables y cargadores", loc: "tras_e2", cat: "electronica", qty: 1, note: "Caja de zapatos", w: 32, l: 22, h: 12 },
-          { id: uid(), name: "Documentos coche", loc: "arm_pasillo", cat: "documentos", qty: 1, note: "Carpeta roja", w: 32, l: 5, h: 24 },
-          { id: uid(), name: "Adornos navideños", loc: "tras_e3", cat: "decoracion", qty: 2, note: "Cajas cartón", w: 50, l: 40, h: 30 },
-          { id: uid(), name: "Mochila senderismo", loc: "tras_suelo", cat: "deportes", qty: 1, note: "Naranja 40L", w: 30, l: 20, h: 55 },
-        ],
-        updatedAt: Date.now()
-      };
-    }
-
-    // ============================================================
-    //  CLOSE OVERLAYS / KEYBOARD
-    // ============================================================
-    ["overlay-item", "overlay-space", "overlay-settings", "overlay-conflict"].forEach(id => {
-      document.getElementById(id).addEventListener("click", function (e) { if (e.target === this) this.classList.remove("show"); });
-    });
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape") ["overlay-item", "overlay-space", "overlay-settings", "overlay-conflict"]
-        .forEach(id => document.getElementById(id).classList.remove("show"));
-    });
-
-    // ============================================================
-    //  INIT
-    // ============================================================
-    loadCfg();
-    loadLocal();
-
-    if (cfg.mode === "synced" && cfg.apiKey && cfg.binId) {
-      launchApp();
-      syncPull(false).then(() => startAutoSync());
-    } else if (cfg.mode === "local") {
-      launchApp();
-    } else {
-      // mostrar setup
-    }
-  </script>
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+ 
+// ─────────────────────────────────────────────
+//  DEFAULT DATA
+// ─────────────────────────────────────────────
+function defaultData() {
+  return {
+    spaces:[
+      {id:"cama",      name:"Bajo la cama",          desc:"Cajas y fundas",       icon:"🛏️",color:"#fef3c7",w:190,l:140,h:30},
+      {id:"arm_dorm",  name:"Armario dormitorio",     desc:"Ropa y complementos",  icon:"🚪",color:"#dbeafe",w:180,l:60, h:220},
+      {id:"arm_pas",   name:"Armario pasillo",        desc:"Abrigos y bolsas",     icon:"🚪",color:"#ede9fe",w:120,l:55, h:200},
+      {id:"tras_e1",   name:"Trastero · Estantería 1",desc:"Herramientas",         icon:"📦",color:"#dcfce7",w:100,l:40, h:40},
+      {id:"tras_e2",   name:"Trastero · Estantería 2",desc:"Electrónica",          icon:"📦",color:"#dcfce7",w:100,l:40, h:40},
+      {id:"tras_e3",   name:"Trastero · Estantería 3",desc:"Cajas varias",         icon:"📦",color:"#dcfce7",w:100,l:40, h:40},
+      {id:"tras_suelo",name:"Trastero · Suelo",       desc:"Objetos grandes",      icon:"🗄️",color:"#f1f5f9",w:"",l:"", h:""},
+    ],
+    items:[
+      {id:uid(),name:"Ropa de invierno",   loc:"cama",     cat:"ropa",        qty:3,note:"Cajas plástico azules",  w:60,l:40,h:20},
+      {id:uid(),name:"Mantas extra",       loc:"arm_dorm", cat:"ropa",        qty:2,note:"Estante superior",       w:50,l:30,h:15},
+      {id:uid(),name:"Sábanas 90 cm",      loc:"arm_dorm", cat:"ropa",        qty:3,note:"",                       w:40,l:30,h:10},
+      {id:uid(),name:"Taladro + brocas",   loc:"tras_e1",  cat:"herramientas",qty:1,note:"Caja negra pequeña",     w:35,l:15,h:15},
+      {id:uid(),name:"Cables y cargadores",loc:"tras_e2",  cat:"electronica", qty:1,note:"Caja de zapatos",        w:32,l:22,h:12},
+      {id:uid(),name:"Documentos coche",   loc:"arm_pas",  cat:"documentos",  qty:1,note:"Carpeta roja",           w:32,l:5, h:24},
+      {id:uid(),name:"Adornos navideños",  loc:"tras_e3",  cat:"decoracion",  qty:2,note:"Cajas cartón",           w:50,l:40,h:30},
+      {id:uid(),name:"Mochila senderismo", loc:"tras_suelo",cat:"deportes",   qty:1,note:"Naranja 40L",            w:30,l:20,h:55},
+    ],
+    updatedAt: Date.now()
+  };
+}
+ 
+// ─────────────────────────────────────────────
+//  OVERLAY CLOSE
+// ─────────────────────────────────────────────
+["overlay-item","overlay-space"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",function(e){if(e.target===this)this.classList.remove("show");});
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") ["overlay-item","overlay-space"]
+    .forEach(id=>document.getElementById(id).classList.remove("show"));
+});
+ 
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+loadCfg();
+loadLocal();
+render();
+ 
+if (cfg.mode === "synced" && cfg.masterKey && cfg.binId) {
+  document.getElementById("sync-bar").style.display = "flex";
+  setSyncDot("busy","Cargando desde servidor…");
+  syncPull(false).then(()=>startAutoSync());
+} else {
+  setSyncDot("off","Modo local");
+}
+</script>
 </body>
-
 </html>
