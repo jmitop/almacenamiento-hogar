@@ -12,14 +12,14 @@
   --ok:#16a34a;--warn:#d97706;--err:#dc2626;--radius:10px;--radius-lg:14px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
- 
+
 /* HEADER */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50}
 .logo{display:flex;align-items:center;gap:10px}
 .logo h1{font-size:16px;font-weight:600}
 .logo small{font-size:11px;color:var(--text2);display:block;margin-top:1px}
 .hbtns{display:flex;gap:7px}
- 
+
 /* SYNC BAR */
 #sync-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 22px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text2)}
 .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s}
@@ -31,7 +31,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 #sync-bar .ml{margin-left:auto;display:flex;gap:6px}
 .sync-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text2)}
 .sync-btn:hover{background:var(--bg);color:var(--text)}
- 
+
 /* BUTTONS */
 .btn{font-family:inherit;font-size:13px;padding:7px 13px;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:background .13s}
 .btn:hover{background:var(--bg)}
@@ -42,27 +42,27 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .btn-danger:hover{background:#fee2e2}
 .btn-ok{background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:8px;padding:7px 13px;font-size:13px;cursor:pointer;font-family:inherit}
 .btn-ok:hover{background:#bbf7d0}
- 
+
 /* TABS */
 .tabs{display:flex;gap:2px;background:var(--bg);padding:14px 22px 0;overflow-x:auto}
 .tab{font-size:13px;padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;border:1px solid transparent;border-bottom:none;color:var(--text2);background:transparent;font-family:inherit;white-space:nowrap}
 .tab.active{background:var(--surface);border-color:var(--border);color:var(--text)}
- 
+
 main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .tab-panel{display:none}.tab-panel.active{display:block}
- 
+
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-bottom:18px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px}
 .stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
 .stat-val{font-size:22px;font-weight:600}
 .stat-sub{font-size:11px;color:var(--text2);margin-top:2px}
- 
+
 /* CONTROLS */
 .controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .controls input,.controls select{flex:1;min-width:140px;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:inherit;outline:none}
 .controls input:focus,.controls select:focus{border-color:var(--border2)}
- 
+
 /* LOCATIONS */
 .locations{display:flex;flex-direction:column;gap:10px}
 .loc-group{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden}
@@ -85,7 +85,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .loc-body{padding:12px}
 .loc-occ-detail{font-size:11px;color:var(--text2);margin-bottom:8px;padding:6px 10px;background:var(--bg);border-radius:7px;display:flex;gap:12px;flex-wrap:wrap}
 .loc-occ-detail span b{color:var(--text);font-weight:600}
- 
+
 /* ITEMS */
 .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(182px,1fr));gap:8px}
 .item-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 11px;position:relative;transition:border-color .12s}
@@ -102,7 +102,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .btn-icon:hover{background:var(--bg);color:var(--text)}
 .empty-loc{padding:14px;text-align:center;font-size:13px;color:var(--text2)}
 .empty-loc a{color:var(--text);cursor:pointer;text-decoration:underline}
- 
+
 /* SPACES TAB */
 .spaces-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:10px;margin-bottom:16px}
 .space-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;display:flex;align-items:flex-start;gap:11px;position:relative}
@@ -119,7 +119,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .sc-actions{position:absolute;top:8px;right:8px;display:none;gap:3px}
 .add-space-card{border:2px dashed var(--border);background:transparent;cursor:pointer;justify-content:center;flex-direction:column;text-align:center;gap:5px;min-height:80px;display:flex;align-items:center;border-radius:var(--radius-lg)}
 .add-space-card:hover{border-color:var(--border2);background:var(--surface2)}
- 
+
 /* CHARTS */
 .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-bottom:22px}
 .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:17px}
@@ -139,7 +139,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .occ-sum-track{flex:1;background:var(--bg);border-radius:20px;height:18px;overflow:hidden;border:1px solid var(--border);position:relative}
 .occ-fill{height:100%;border-radius:20px;position:absolute;left:0;top:0;transition:width .5s}
 .occ-sum-pct{font-size:12px;font-weight:600;min-width:36px;text-align:right}
- 
+
 /* CONFIG TAB */
 .cfg-page{max-width:620px}
 .cfg-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px}
@@ -167,7 +167,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .danger-zone{border-top:1px solid #fecaca;margin-top:14px;padding-top:14px}
 .danger-zone-title{font-size:12px;font-weight:600;color:var(--err);margin-bottom:8px}
 .hint{font-size:12px;color:var(--text2);margin-top:6px}
- 
+
 /* MODALS */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}
 .overlay.show{display:flex}
@@ -193,15 +193,15 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px;align-items:center}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
 .section-header h2{font-size:15px;font-weight:600}
- 
+
 /* TOAST */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:13px;padding:9px 18px;border-radius:10px;z-index:9999;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.18);pointer-events:none;opacity:0}
 </style>
 </head>
 <body>
- 
+
 <div id="toast"></div>
- 
+
 <!-- SYNC BAR -->
 <div id="sync-bar" style="display:none">
   <div class="sync-dot off" id="sync-dot"></div>
@@ -210,7 +210,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
     <button class="sync-btn" onclick="syncPull(true)">↓ Sync</button>
   </div>
 </div>
- 
+
 <header>
   <div class="logo">
     <span style="font-size:20px">🏠</span>
@@ -224,16 +224,16 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
     <button class="btn btn-dark" onclick="openItemModal()">+ Añadir objeto</button>
   </div>
 </header>
- 
+
 <div class="tabs">
   <button class="tab active" onclick="switchTab('inventario',this)">📋 Inventario</button>
   <button class="tab" onclick="switchTab('espacios',this)">🗂 Espacios</button>
   <button class="tab" onclick="switchTab('graficos',this)">📊 Gráficos</button>
   <button class="tab" onclick="switchTab('config',this)">⚙️ Configuración</button>
 </div>
- 
+
 <main>
- 
+
 <!-- INVENTARIO -->
 <div class="tab-panel active" id="panel-inventario">
   <div class="stats" id="stats"></div>
@@ -244,7 +244,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
   </div>
   <div class="locations" id="locations"></div>
 </div>
- 
+
 <!-- ESPACIOS -->
 <div class="tab-panel" id="panel-espacios">
   <div class="section-header">
@@ -254,23 +254,23 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
   <div class="spaces-grid" id="spaces-grid"></div>
   <p class="hint">Pasa el cursor sobre una tarjeta para editarla · Las dimensiones permiten calcular % de ocupación por volumen.</p>
 </div>
- 
+
 <!-- GRÁFICOS -->
 <div class="tab-panel" id="panel-graficos">
   <div class="charts-grid" id="charts-grid"></div>
 </div>
- 
+
 <!-- CONFIGURACIÓN -->
 <div class="tab-panel" id="panel-config">
 <div class="cfg-page">
- 
+
   <!-- Estado actual -->
   <div class="cfg-section">
     <div class="cfg-section-title">🔌 Estado de sincronización</div>
     <div class="cfg-section-sub">Conecta con JSONBin.io para que todos los dispositivos compartan los mismos datos en tiempo real. Es gratuito y no requiere servidor propio.</div>
- 
+
     <div id="cfg-mode-indicator"></div>
- 
+
     <div class="cfg-field">
       <label>🔑 Master Key <span style="color:var(--text3);font-weight:400">(lectura + escritura)</span></label>
       <input type="password" id="cfg-master" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" oninput="onCfgInput()"/>
@@ -278,7 +278,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
         Obtén tu Master Key en <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → inicia sesión → menú superior <strong>API Keys</strong> → copia la <strong>Master Key</strong>.
       </div>
     </div>
- 
+
     <div class="cfg-field">
       <label>🔓 Access Key <span style="color:var(--text3);font-weight:400">(solo lectura, recomendado compartir esta)</span></label>
       <input type="password" id="cfg-access" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
@@ -286,7 +286,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
         En JSONBin → <strong>API Keys</strong> → <strong>Access Keys</strong> → crea una nueva. Comparte esta clave con tu familia en lugar de la Master Key.
       </div>
     </div>
- 
+
     <div class="cfg-field">
       <label>📦 Bin ID <span style="color:var(--text3);font-weight:400">(identificador del almacén de datos)</span></label>
       <input type="text" id="cfg-binid" placeholder="67xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
@@ -294,21 +294,21 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
         Si es tu primera vez déjalo vacío → se creará automáticamente. Si otra persona ya creó el bin, pega aquí su ID para compartir los mismos datos.
       </div>
     </div>
- 
+
     <div class="cfg-actions">
       <button class="btn btn-dark" id="btn-connect" onclick="cfgConnect()">🔗 Conectar y sincronizar</button>
       <button class="btn" onclick="cfgTestOnly()">🧪 Solo probar conexión</button>
     </div>
- 
+
     <div class="cfg-status" id="cfg-status-msg"></div>
- 
+
     <!-- Bin ID activo -->
     <div id="cfg-bin-display" style="display:none;margin-top:14px">
       <div style="font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500">Bin ID activo (comparte esto con tu familia):</div>
       <div class="bin-id-box"><small>Bin ID</small><span id="cfg-bin-val">—</span></div>
       <button class="copy-btn" onclick="copyBinId()">📋 Copiar Bin ID</button>
     </div>
- 
+
     <div class="danger-zone" id="cfg-danger" style="display:none">
       <div class="danger-zone-title">⚠️ Zona de riesgo</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -317,7 +317,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
       </div>
     </div>
   </div>
- 
+
   <!-- Datos y backup -->
   <div class="cfg-section">
     <div class="cfg-section-title">💾 Datos y copia de seguridad</div>
@@ -332,7 +332,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
       Objetos guardados: <strong id="cfg-item-count">—</strong> &nbsp;·&nbsp; Espacios: <strong id="cfg-space-count">—</strong> &nbsp;·&nbsp; Última modificación: <strong id="cfg-last-mod">—</strong>
     </div>
   </div>
- 
+
   <!-- Instrucciones rápidas -->
   <div class="cfg-section">
     <div class="cfg-section-title">📖 Cómo empezar con JSONBin (3 pasos)</div>
@@ -344,12 +344,12 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
       <strong style="color:var(--text)">Plan gratuito:</strong> 10.000 peticiones/mes · 10 MB por bin · Suficiente para uso doméstico.
     </div>
   </div>
- 
+
 </div>
 </div><!-- /panel-config -->
- 
+
 </main>
- 
+
 <!-- ===== MODAL OBJETO ===== -->
 <div class="overlay" id="overlay-item">
 <div class="modal">
@@ -375,7 +375,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
   </div>
 </div>
 </div>
- 
+
 <!-- ===== MODAL ESPACIO ===== -->
 <div class="overlay" id="overlay-space">
 <div class="modal">
@@ -399,7 +399,7 @@ main{max-width:1020px;margin:0 auto;padding:18px 15px}
   </div>
 </div>
 </div>
- 
+
 <script>
 // ─────────────────────────────────────────────
 //  CONSTANTS
@@ -408,7 +408,7 @@ const SK_DATA = "hogar_v5_data";
 const SK_CFG  = "hogar_v5_cfg";
 const JBIN    = "https://api.jsonbin.io/v3";
 const AUTO_MS = 60000;
- 
+
 const ICONS = ["🛏️","🚪","📦","🗄️","🧺","🪜","🏠","🛋️","🧹","🔧","📚","🎒","🪣","🖼️","🎸","⚽","🧸","🍳","❄️","💼"];
 const CLRS  = ["#f1f5f9","#fef3c7","#dcfce7","#dbeafe","#ede9fe","#fce7f3","#ffedd5","#ccfbf1","#fef9c3","#fee2e2"];
 const CATS  = [
@@ -423,7 +423,7 @@ const CATS  = [
   {id:"limpieza",    label:"Limpieza",     bg:"#e0f2fe",tc:"#0c4a6e"},
   {id:"otro",        label:"Otro",         bg:"#f1efe8",tc:"#444441"},
 ];
- 
+
 // ─────────────────────────────────────────────
 //  STATE
 // ─────────────────────────────────────────────
@@ -435,7 +435,7 @@ let editingSpaceId = null;
 let selIcon  = "📦";
 let selColor = "#f1f5f9";
 let autoTimer = null;
- 
+
 // ─────────────────────────────────────────────
 //  UTILS
 // ─────────────────────────────────────────────
@@ -456,7 +456,7 @@ const occData = sp => {
   return sv>0 ? {has:true,sv,uv,pct:Math.min(100,uv/sv*100),noDims}
               : {has:false,sv:0,uv,pct:0,noDims};
 };
- 
+
 // ─────────────────────────────────────────────
 //  LOCAL STORAGE
 // ─────────────────────────────────────────────
@@ -475,7 +475,7 @@ function loadCfg() {
   try { const r=localStorage.getItem(SK_CFG); if(r) cfg=JSON.parse(r); } catch(e){}
 }
 function saveCfg() { localStorage.setItem(SK_CFG, JSON.stringify(cfg)); }
- 
+
 // ─────────────────────────────────────────────
 //  JSONBIN API
 // ─────────────────────────────────────────────
@@ -500,7 +500,7 @@ async function jbFetch(method, path, body, readOnly=false) {
   }
   return res.json();
 }
- 
+
 async function jbCreate() {
   const r = await jbFetch("POST", "/b", {record: data, name:"AlmacenamientoHogar"});
   return r.metadata.id;
@@ -512,7 +512,7 @@ async function jbRead() {
 async function jbWrite() {
   await jbFetch("PUT", "/b/"+cfg.binId, data);
 }
- 
+
 // ─────────────────────────────────────────────
 //  SYNC STATUS
 // ─────────────────────────────────────────────
@@ -522,7 +522,7 @@ function setSyncDot(state, label) {
   d.className="sync-dot "+state;
   l.textContent=label;
 }
- 
+
 async function syncPull(manual=false) {
   if (cfg.mode !== "synced") return;
   setSyncDot("busy","Sincronizando…");
@@ -541,7 +541,7 @@ async function syncPull(manual=false) {
     if (manual) toast("❌ "+e.message, true);
   }
 }
- 
+
 async function syncPush() {
   if (cfg.mode !== "synced") return;
   setSyncDot("busy","Guardando…");
@@ -553,18 +553,18 @@ async function syncPush() {
     toast("❌ "+e.message, true);
   }
 }
- 
+
 async function saveAndSync() {
   saveLocal();
   render();
   await syncPush();
 }
- 
+
 function startAutoSync() {
   if (autoTimer) clearInterval(autoTimer);
   if (cfg.mode === "synced") autoTimer = setInterval(()=>syncPull(false), AUTO_MS);
 }
- 
+
 // ─────────────────────────────────────────────
 //  CONFIG TAB LOGIC
 // ─────────────────────────────────────────────
@@ -573,7 +573,7 @@ function renderConfigTab() {
   document.getElementById("cfg-master").value  = cfg.masterKey  || "";
   document.getElementById("cfg-access").value  = cfg.accessKey  || "";
   document.getElementById("cfg-binid").value   = cfg.binId      || "";
- 
+
   // mode badge
   const ind = document.getElementById("cfg-mode-indicator");
   if (cfg.mode === "synced") {
@@ -587,10 +587,10 @@ function renderConfigTab() {
     document.getElementById("cfg-bin-display").style.display = "none";
     document.getElementById("cfg-danger").style.display = "none";
   }
- 
+
   refreshCfgCounts();
 }
- 
+
 function refreshCfgCounts() {
   const ic = document.getElementById("cfg-item-count");
   const sc = document.getElementById("cfg-space-count");
@@ -601,17 +601,17 @@ function refreshCfgCounts() {
     ? new Date(data.updatedAt).toLocaleString("es-ES")
     : "—";
 }
- 
+
 function onCfgInput() {
   // auto-show/hide access & bin fields based on master key presence
 }
- 
+
 function cfgSetStatus(msg, type) {
   const el = document.getElementById("cfg-status-msg");
   el.className = "cfg-status " + type;
   el.textContent = msg;
 }
- 
+
 async function cfgTestOnly() {
   const mk = document.getElementById("cfg-master").value.trim();
   const bid = document.getElementById("cfg-binid").value.trim();
@@ -631,20 +631,20 @@ async function cfgTestOnly() {
     cfgSetStatus("❌ Error: "+e.message, "err");
   }
 }
- 
+
 async function cfgConnect() {
   const mk  = document.getElementById("cfg-master").value.trim();
   const ak  = document.getElementById("cfg-access").value.trim();
   const bid = document.getElementById("cfg-binid").value.trim();
- 
+
   if (!mk) { cfgSetStatus("⚠️ La Master Key es obligatoria.", "err"); return; }
- 
+
   cfgSetStatus("Conectando…", "info");
   document.getElementById("btn-connect").disabled = true;
- 
+
   cfg.masterKey = mk;
   cfg.accessKey = ak;
- 
+
   try {
     if (bid) {
       // use existing bin
@@ -679,7 +679,7 @@ async function cfgConnect() {
       cfg.binId = r.metadata.id;
       cfgSetStatus("✅ Bin creado correctamente · ID: "+cfg.binId, "ok");
     }
- 
+
     cfg.mode = "synced";
     saveCfg();
     renderConfigTab();
@@ -687,14 +687,14 @@ async function cfgConnect() {
     setSyncDot("ok","Conectado");
     toast("✅ Sincronización activa · Bin: "+cfg.binId);
     render();
- 
+
   } catch(e) {
     cfgSetStatus("❌ "+e.message, "err");
   } finally {
     document.getElementById("btn-connect").disabled = false;
   }
 }
- 
+
 function cfgDisconnect() {
   if (!confirm("¿Desconectar JSONBin? Los datos quedan guardados localmente.")) return;
   cfg.mode = "local";
@@ -709,7 +709,7 @@ function cfgDisconnect() {
   renderConfigTab();
   toast("Modo local activado");
 }
- 
+
 function cfgClearLocal() {
   if (!confirm("⚠️ ¿Borrar TODOS los datos locales? Esta acción no se puede deshacer.")) return;
   data = defaultData();
@@ -717,7 +717,7 @@ function cfgClearLocal() {
   render();
   toast("Datos locales borrados · Datos de ejemplo cargados.");
 }
- 
+
 function copyBinId() {
   navigator.clipboard.writeText(cfg.binId).then(()=>toast("📋 Bin ID copiado")).catch(()=>{
     // fallback
@@ -727,7 +727,7 @@ function copyBinId() {
     toast("📋 Bin ID copiado");
   });
 }
- 
+
 // ─────────────────────────────────────────────
 //  TOAST
 // ─────────────────────────────────────────────
@@ -741,7 +741,7 @@ function toast(msg, isErr=false) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.style.opacity="0", 3200);
 }
- 
+
 // ─────────────────────────────────────────────
 //  TABS
 // ─────────────────────────────────────────────
@@ -754,7 +754,7 @@ function switchTab(name, el) {
   if (name==="espacios") renderSpaces();
   if (name==="config")   renderConfigTab();
 }
- 
+
 // ─────────────────────────────────────────────
 //  FILTERS
 // ─────────────────────────────────────────────
@@ -766,7 +766,7 @@ function populateFilters() {
   const fC=document.getElementById("filter-cat");
   if(fC.children.length<=1) CATS.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=c.label;fC.appendChild(o);});
 }
- 
+
 // ─────────────────────────────────────────────
 //  RENDER INVENTORY
 // ─────────────────────────────────────────────
@@ -782,7 +782,7 @@ function render() {
   renderStats(f);
   renderLocations(fl?data.spaces.filter(s=>s.id===fl):data.spaces, f);
 }
- 
+
 function renderStats(f) {
   const qty=f.reduce((s,i)=>s+(parseInt(i.qty)||1),0);
   const locs=new Set(f.map(i=>i.loc)).size;
@@ -799,7 +799,7 @@ function renderStats(f) {
       :{label:"Ocupación global",val:"—",sub:"Añade dimensiones",c:""},
   ].map(s=>`<div class="stat"><div class="stat-label">${s.label}</div><div class="stat-val"${s.c?` style="color:${s.c}"`:""}>${s.val}</div>${s.sub?`<div class="stat-sub">${s.sub}</div>`:""}</div>`).join("");
 }
- 
+
 function renderLocations(locs, filtered) {
   document.getElementById("locations").innerHTML = locs.map(loc=>{
     const li=filtered.filter(i=>i.loc===loc.id);
@@ -829,7 +829,7 @@ function renderLocations(locs, filtered) {
     </div>`;
   }).join("");
 }
- 
+
 function renderItem(item) {
   const c=catOf(item.cat);
   const v=vol3(item.w,item.l,item.h);
@@ -846,9 +846,9 @@ function renderItem(item) {
     ${item.note?`<div class="item-note">${esc(item.note)}</div>`:""}
   </div>`;
 }
- 
+
 function toggleLoc(id){collapsed[id]=!collapsed[id];render();}
- 
+
 // ─────────────────────────────────────────────
 //  ITEM MODAL
 // ─────────────────────────────────────────────
@@ -874,7 +874,7 @@ function openItemModalFor(defLoc, editId) {
   setTimeout(()=>document.getElementById("f-name").focus(),50);
 }
 function closeItemModal(){document.getElementById("overlay-item").classList.remove("show");}
- 
+
 function updateItemVolPrev() {
   const w=n(document.getElementById("f-w").value);
   const l=n(document.getElementById("f-l").value);
@@ -884,7 +884,7 @@ function updateItemVolPrev() {
   if(w>0&&l>0&&h>0){d.style.display="block";d.textContent=`📦 ${fmtV(w*l*h)} por unidad${qty>1?" · Total: "+fmtV(w*l*h*qty):""}"`;}
   else d.style.display="none";
 }
- 
+
 async function saveItemModal() {
   const name=document.getElementById("f-name").value.trim();
   if(!name){document.getElementById("f-name").focus();return;}
@@ -901,14 +901,14 @@ async function saveItemModal() {
   closeItemModal();
   await saveAndSync();
 }
- 
+
 async function deleteCurrentItem() {
   if(!confirm("¿Eliminar este objeto?"))return;
   data.items=data.items.filter(i=>i.id!==editingItemId);
   closeItemModal();
   await saveAndSync();
 }
- 
+
 // ─────────────────────────────────────────────
 //  SPACE MODAL
 // ─────────────────────────────────────────────
@@ -929,14 +929,14 @@ function openSpaceModal(editId) {
   setTimeout(()=>document.getElementById("s-name").focus(),50);
 }
 function closeSpaceModal(){document.getElementById("overlay-space").classList.remove("show");}
- 
+
 function updateSpaceVolPrev() {
   const w=n(document.getElementById("s-w").value),l=n(document.getElementById("s-l").value),h=n(document.getElementById("s-h").value);
   const d=document.getElementById("space-vol-prev");
   if(w>0&&l>0&&h>0){d.style.display="block";d.textContent=`📐 Volumen total: ${fmtV(w*l*h)}`;}
   else d.style.display="none";
 }
- 
+
 function buildIconPicker(){
   document.getElementById("icon-picker").innerHTML=ICONS.map(ico=>
     `<div class="icon-option${ico===selIcon?" sel":""}" onclick="pickIcon('${ico}')">${ico}</div>`).join("");
@@ -947,7 +947,7 @@ function buildColorPicker(){
 }
 function pickIcon(ico){selIcon=ico;buildIconPicker();}
 function pickColor(c){selColor=c;buildColorPicker();}
- 
+
 async function saveSpaceModal() {
   const name=document.getElementById("s-name").value.trim();
   if(!name){document.getElementById("s-name").focus();return;}
@@ -961,7 +961,7 @@ async function saveSpaceModal() {
   await saveAndSync();
   renderSpaces();
 }
- 
+
 async function deleteCurrentSpace() {
   if(data.items.some(i=>i.loc===editingSpaceId)){alert("Mueve o elimina primero los objetos de este espacio.");return;}
   if(!confirm("¿Eliminar este espacio?"))return;
@@ -970,7 +970,7 @@ async function deleteCurrentSpace() {
   await saveAndSync();
   renderSpaces();
 }
- 
+
 // ─────────────────────────────────────────────
 //  SPACES TAB
 // ─────────────────────────────────────────────
@@ -997,7 +997,7 @@ function renderSpaces() {
       <span style="font-size:12px;color:var(--text2)">Nuevo espacio</span>
     </div>`;
 }
- 
+
 // ─────────────────────────────────────────────
 //  CHARTS
 // ─────────────────────────────────────────────
@@ -1007,7 +1007,7 @@ function renderCharts() {
   c.innerHTML=`<div class="chart-card" id="c-occ"></div><div class="chart-card" id="c-cats"></div><div class="chart-card" id="c-items"></div><div class="chart-card" id="c-vol"></div>`;
   buildOccChart(); buildCatsChart(); buildItemsChart(); buildVolChart();
 }
- 
+
 function buildOccChart() {
   const swd=data.spaces.filter(s=>spVol(s)>0);
   if(!swd.length){document.getElementById("c-occ").innerHTML=`<div class="chart-title">🏗 Ocupación por espacio</div><p class="chart-empty">Añade dimensiones a los espacios.</p>`;return;}
@@ -1023,7 +1023,7 @@ function buildOccChart() {
       <span style="color:var(--text2)">${fmtV(uv)} de ${fmtV(tv)}</span>
       <span style="font-weight:600;color:${occCl(gp)}">${gp.toFixed(0)}% global</span></div>`;
 }
- 
+
 function buildCatsChart() {
   const counts={};CATS.forEach(c=>counts[c.id]=0);
   data.items.forEach(i=>{if(counts[i.cat]!==undefined)counts[i.cat]++;});
@@ -1041,7 +1041,7 @@ function buildCatsChart() {
     ctx.fillStyle="#888780";ctx.font="10px sans-serif";ctx.fillText("objetos",cx,cy+8);
   });
 }
- 
+
 function buildItemsChart() {
   const counts={};data.spaces.forEach(s=>counts[s.id]=0);data.items.forEach(i=>{if(counts[i.loc]!==undefined)counts[i.loc]++;});
   const sorted=data.spaces.map(s=>({s,n:counts[s.id]||0})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
@@ -1049,7 +1049,7 @@ function buildItemsChart() {
   document.getElementById("c-items").innerHTML=`<div class="chart-title">📍 Objetos por espacio</div>`+
     sorted.map(({s,n})=>`<div class="bar-row"><div class="bar-label" title="${s.name}">${s.icon} ${s.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/max*100)}%;background:${s.color||"#e0ddd5"}"></div></div><div class="bar-num">${n}</div></div>`).join("");
 }
- 
+
 function buildVolChart() {
   const vols={};CATS.forEach(c=>vols[c.id]=0);
   data.items.forEach(i=>{const v=vol3(i.w,i.l,i.h)*(parseInt(i.qty)||1);if(vols[i.cat]!==undefined)vols[i.cat]+=v;});
@@ -1059,7 +1059,7 @@ function buildVolChart() {
   document.getElementById("c-vol").innerHTML=`<div class="chart-title">📦 Volumen por categoría</div>`+
     sorted.map(({c,v})=>`<div class="bar-row"><div class="bar-label">${c.label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxV*100)}%;background:${c.bg}"></div></div><div class="bar-num" style="font-size:10px">${fmtV(v)}</div></div>`).join("");
 }
- 
+
 // ─────────────────────────────────────────────
 //  EXPORT / IMPORT  — CSV FIX: data URI
 // ─────────────────────────────────────────────
@@ -1082,7 +1082,7 @@ function exportCSV() {
   document.body.removeChild(a);
   toast("✅ CSV descargado");
 }
- 
+
 function exportJSON() {
   const json = JSON.stringify(data, null, 2);
   const uri = "data:application/json;charset=utf-8," + encodeURIComponent(json);
@@ -1094,11 +1094,11 @@ function exportJSON() {
   document.body.removeChild(a);
   toast("✅ JSON descargado");
 }
- 
+
 function importJSON() {
   document.getElementById("import-file").click();
 }
- 
+
 function handleImport(evt) {
   const file = evt.target.files[0];
   if (!file) return;
@@ -1119,7 +1119,7 @@ function handleImport(evt) {
   reader.readAsText(file);
   evt.target.value = "";
 }
- 
+
 // ─────────────────────────────────────────────
 //  DEFAULT DATA
 // ─────────────────────────────────────────────
@@ -1147,7 +1147,7 @@ function defaultData() {
     updatedAt: Date.now()
   };
 }
- 
+
 // ─────────────────────────────────────────────
 //  OVERLAY CLOSE
 // ─────────────────────────────────────────────
@@ -1158,14 +1158,14 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape") ["overlay-item","overlay-space"]
     .forEach(id=>document.getElementById(id).classList.remove("show"));
 });
- 
+
 // ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
 loadCfg();
 loadLocal();
 render();
- 
+
 if (cfg.mode === "synced" && cfg.masterKey && cfg.binId) {
   document.getElementById("sync-bar").style.display = "flex";
   setSyncDot("busy","Cargando desde servidor…");
